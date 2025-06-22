@@ -1,0 +1,2979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>SLA Operative Character Sheet</title>
+  <link id="themeStylesheet" rel="stylesheet" href="styles.css">
+
+
+</head>
+<body>
+<!-- Tab Buttons -->
+
+  <div class="sheet">
+
+<div id="characterCreation" style="display: flex; flex-direction: column;">
+  <ol id="creationSteps">
+    <li>
+      <label>
+        <input type="checkbox" id="step1">
+        Select a <strong>Species</strong> from the dropdown menu
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" id="step2">
+        Click to Allocate points to your <strong>Stats</strong>
+        <button type="button" id="allocateBonusBtn">Allocate Stats</button>
+		<em>(Click 'Reset' at the bottom to start over at any time)</em>
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" id="step3">
+        Click to Add your <strong>Species Skills</strong>
+        <button type="button" id="addSpeciesSkillsBtn">Add Species Skills</button>
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" id="step4">
+        Select a <strong>Package</strong> from the dropdown menu
+      </label>
+    </li>
+    <li>
+      <label>
+        <input type="checkbox" id="step5">
+        Click to Allocate <strong>30 Skill Points</strong>
+        <button type="button" id="allocateSkillPointsBtn">Allocate Skill Points</button>
+        <input type="number" id="pointsRemainingDisplay" readonly value="0" style="width:60px; margin-left:10px;">
+        <em>(Click “Add Skill” to create a new skill, then type its name and enter is's STAT type)</em>
+      </label>
+
+          <button type="button" id="resetSkillAllocationBtn">Reset Skill Allocation Stage</button>
+    </li>
+ <li>
+      <label>
+        <input type="checkbox" id="step6">
+        Click to Allocate your <strong>Ratings Points</strong>
+        <button type="button" id="startRatingsStepBtn">Start Ratings Points</button>
+      </label>
+    </li>
+  </ol>
+
+  <!-- Step 6 Panel (hidden by default) -->
+  <div id="ratingsPointsStep" style="display:none; flex-direction:column; gap:1em; margin-top:1em;">
+    <h2>Step 6: Ratings Points</h2>
+
+    <div class="rp-category">
+      <strong>Body</strong> (STR + DEX = <span id="bodyTotal">0</span>) →
+      <input id="bodyInitRP" type="number" readonly size="1">
+      <button class="rp-add" data-cat="Body">+</button>
+      <button class="rp-rem" data-cat="Body">–</button>
+      (<span id="bodyExtra">0</span> extra)
+    </div>
+
+    <div class="rp-category">
+      <strong>Brain</strong> (KNOW + CONC = <span id="brainTotal">0</span>) →
+      <input id="brainInitRP" type="number" readonly size="1">
+      <button class="rp-add" data-cat="Brain">+</button>
+      <button class="rp-rem" data-cat="Brain">–</button>
+      (<span id="brainExtra">0</span> extra)
+    </div>
+
+    <div class="rp-category">
+      <strong>Bravado</strong> (CHA + COOL = <span id="bravadoTotal">0</span>) →
+      <input id="bravadoInitRP" type="number" readonly size="1">
+      <button class="rp-add" data-cat="Bravado">+</button>
+      <button class="rp-rem" data-cat="Bravado">–</button>
+      (<span id="bravadoExtra">0</span> extra)
+    </div>
+
+    <p>Extra points remaining: <span id="rpRemaining">3</span></p>
+    <button type="button" id="confirmRpBtn">Confirm Ratings Points</button>
+  </div>
+
+  <!-- Tie-breaker modal (hidden unless there’s a tie) -->
+<div id="rpTieModal" class="modal" style="display:none; position:fixed;top:0;left:0;
+     width:100%;height:100%;background:rgba(0,0,0,0.5);justify-content:center;align-items:center;">
+  <div class="modal-content" style="background:#fff;padding:20px;border-radius:4px;max-width:400px;">
+    <h5 class="modal-title">Tie Breaker</h5>
+    <!-- first-group is where you pick who gets 2 RP -->
+    <div class="tie-group first-group" style="margin:1em 0;"></div>
+    <!-- second-group is where you pick who gets 1 RP -->
+    <div class="tie-group second-group" style="margin:1em 0;"></div>
+    <div style="text-align:right">
+      <button id="rpTieSubmit">Apply</button>
+    </div>
+  </div>
+</div>
+</div>
+
+  <div class="sheet-header">
+    <img src="SLA logo.png" alt="Logo" class="header-image">
+  <h1>SLA Operative</h1>
+<div class="tabs">
+  <button class="tab-button active" data-tab="character">Character</button>
+  <button class="tab-button" data-tab="inventory">Inventory</button>
+  <button class="tab-button" data-tab="notes">Notes</button>
+    <button type="button" id="toggleContainersBtn">Toggle Character Creation</button>
+	  <span id="globalLockToggle"
+        style="cursor:pointer; margin-left:auto; font-size:1.2em;">
+    🔓
+  </span>
+</div>
+
+
+</div>
+  <section id="character" class="tab-content active">
+    <!-- everything you had below “Top Container” etc. goes here -->
+
+    <!-- Top Container: Clearance Card & Vitals -->
+    <div id="topContainer">
+      <div class="frame" id="clearanceCard">
+        <div class="header-container">
+          <h3>SLA Operative Clearance Card</h3>
+
+          <!-- Portrait moved above LaD Account -->
+          <div class="portrait" id="portraitArea">
+            <img id="portraitImg" src="" alt="Portrait">
+            <span id="portraitPlaceholder">Drag Image Here</span>
+          </div>
+          <div class="lad-account">
+            <input type="checkbox" id="ladAccount">
+            <label for="ladAccount">LaD Account</label>
+          </div>
+        </div>
+        <!-- Info fields container for Name, Species, Package & Squad -->
+        <div class="info-fields">
+          <div class="name-row">
+            <div>
+              <label for="name">Name:</label>
+              <input type="text" id="name" class="string-field" placeholder="Enter Name">
+            </div>
+            <div class="scl-box">
+              <input type="text" id="scl" placeholder="SCL">
+            </div>
+          </div>
+          <label for="species">Species:</label>
+          <select id="species" class="dropdown">
+            <option value="">Select Species</option>
+            <option value="Human" data-basehp="14">Human</option>
+            <option value="Ebonite" data-basehp="14">Ebonite</option>
+            <option value="Frother" data-basehp="15">Frother</option>
+            <option value="Stormer 313 'Malice'" data-basehp="22">Stormer 313 'Malice'</option>
+            <option value="Stormer 711 'Xeno'" data-basehp="20">Stormer 711 'Xeno'</option>
+            <option value="Shaktar" data-basehp="19">Shaktar</option>
+            <option value="Wraithen" data-basehp="14">Wraithen</option>
+            <option value="ADV Carrien" data-basehp="20">ADV Carrien</option>
+            <option value="Neophron" data-basehp="11">Neophron</option>
+          </select>
+          <br>
+
+          <label for="package">Package:</label>
+          <select id="package" class="dropdown" disabled>
+            <option value="">Select Package</option>
+            <option value="Strike and Sweep">Strike and Sweep</option>
+<option value="Close Assault" title="Min STR 2, DEX 2">Close Assault</option>
+
+<option value="Heavy Support" title="Min STR 2, DEX 2">Heavy Support</option>
+<option value="Scout" title="Min COOL 2, DEX 2">Scout</option>
+<option value="Medic" title="Min KNOW 3">Medic</option>
+<option value="Investigation and Interrogation" title="Min KNOW 2, COOL 2">Investigation and Interrogation</option>
+<option value="Technical" title="Min CONC 3">Technical</option>
+<option value="Bureaucrat" title="Min KNOW 2, COOL 2">Bureaucrat</option>
+
+          </select>
+          <br>
+          <label for="squad">Squad Name:</label>
+          <input type="text" id="squad" class="string-field" placeholder="Enter Squad Name">
+          <div class="clear"></div>
+        </div>
+      </div>
+
+      <div class="frame" id="vitalsBox">
+        <div class="block-header">Vitals</div>
+        <div class="field-group">
+          <label for="initBonus">Initiative Bonus:</label>
+          <input type="number" id="initBonus" placeholder="">
+        </div>
+<div class="field-group " id="hpCurrentContainer">
+  <label for="hpCurrent">Hit Points (Current):</label>
+  <div class="hp-container" >
+    <input type="number"  id="hpCurrent" placeholder="" value="8">
+    <button type="button" id="restoreHpBtn" title="Restore HP">Restore HP</button>
+  </div>
+</div>
+        <div class="field-group">
+          <label for="hpMax">Hit Points (Max):</label>
+          <input type="number" id="hpMax" placeholder="">
+        </div>
+
+      </div>
+    <img src="SLA logo.png" alt="Logo" class="corner-image">
+
+    </div>
+
+
+    <!-- Upper Container: Ratings, Stats, Wounds & Skills -->
+
+	<div id="threeColumn">
+  <div id="leftColumn" class="frame-wrapper">
+        <div class="frame" id="ratingsBox">
+          <div class="block-header">Ratings Points</div>
+          <div class="grid-container">
+            <div class="grid-item">
+              <label for="body">Body:</label>
+              <input type="number" id="body" placeholder="">
+            </div>
+            <div class="grid-item">
+              <label for="brains">Brains:</label>
+              <input type="number" id="brains" placeholder="">
+            </div>
+            <div class="grid-item">
+              <label for="bravado">Bravado:</label>
+              <input type="number" id="bravado" placeholder="">
+            </div>
+          </div>
+        </div>
+        <div class="frame" id="statsBox">
+          <div class="block-header">Stats
+		  <button type="button" id="restoreLuckBtn" title="Restore Luck/Flux">Restore</button> 
+		  </div>
+		  
+          <div class="grid-container">
+            <div class="grid-item">
+              <label for="str">STR:</label>
+              <input type="number" id="str" placeholder="">
+            </div>
+			            <div class="grid-item">
+              <label for="know">KNOW:</label>
+              <input type="number" id="know" placeholder="">
+            </div>
+			            <div class="grid-item">
+              <label for="cha">CHA:</label>
+              <input type="number" id="cha" placeholder="">
+            </div>
+            <div class="grid-item">
+			           
+              <label for="luckflux_current">Luck/Flux (Current):</label>
+			  		   <div class="luck-container">
+              <input type="number" id="luckflux_current" placeholder="">
+	
+			      
+  </div>
+            </div>
+
+			 <div class="grid-item">
+              <label for="dex">DEX:</label>
+              <input type="number" id="dex" placeholder="">
+            </div>
+
+            <div class="grid-item">
+              <label for="conc">CONC:</label>
+              <input type="number" id="conc" placeholder="">
+            </div>
+
+            <div class="grid-item">
+              <label for="cool">COOL:</label>
+              <input type="number" id="cool" placeholder="">
+            </div>
+
+            <div class="grid-item">
+              <label for="luckflux_max">Luck/Flux (Max):</label>
+            
+    <input type="number" id="luckflux_max" placeholder="">
+
+            </div>
+          </div>
+        </div>
+        <div class="frame" id="woundsBox">
+          <div class="block-header">Wounds</div>
+          <div class="grid-container">
+            <div class="wounds-item wounds-item">
+              <input type="checkbox" id="wound-head">
+              <label for="wound-head">Head</label>
+            </div>
+            <div class="wounds-item wounds-item">
+              <input type="checkbox" id="wound-torso">
+              <label for="wound-torso">Torso</label>
+            </div>
+            <div class="wounds-item wounds-item">
+              <input type="checkbox" id="wound-left-arm">
+              <label for="wound-left-arm">Left Arm</label>
+            </div>
+            <div class="wounds-item wounds-item">
+              <input type="checkbox" id="wound-right-arm">
+              <label for="wound-right-arm">Right Arm</label>
+            </div>
+            <div class="wounds-item wounds-item">
+              <input type="checkbox" id="wound-left-leg">
+              <label for="wound-left-leg">Left Leg</label>
+            </div>
+            <div class="wounds-item wounds-item">
+              <input type="checkbox" id="wound-right-leg">
+              <label for="wound-right-leg">Right Leg</label>
+            </div>
+          </div>
+			<p id="woundsStatus">No wounds</p>
+			<p id="woundsCritical"></p>
+        </div>
+ <!-- Container for Movement/Encumbrance and Money/XP frames -->
+<div id="movementMoneyContainer">
+<!-- Left frame: Movement & Encumbrance -->
+<div class="frame" id="movementEncumbranceBox">
+  <div class="block-header">Movement & Encumbrance</div>
+  <div class="grid-container">
+    <div class="grid-item">
+      <label for="move_closing">Move: Closing</label>
+      <input type="number" id="move_closing" placeholder="">
+    </div>
+
+    <div class="grid-item">
+      <label for="enc_current">Encumbrance</label>
+      <input type="number" id="enc_current" placeholder="">
+    </div>
+	    <div class="grid-item">
+      <label for="move_rushing">Move: Rushing</label>
+      <input type="number" id="move_rushing" placeholder="">
+    </div>
+    <div class="grid-item">
+      <label for="enc_max">Encumbrance (Max)</label>
+      <input type="number" id="enc_max" placeholder="">
+    </div>
+  </div>
+</div>
+  
+<div class="frame" id="moneyXpBox">
+  <div class="block-header">Money & XP</div>
+  <div class="grid-container">
+    <div class="grid-item">
+      <label for="credits">Credits</label>
+      <input type="number" id="credits" placeholder="">
+    </div>
+    <div class="grid-item">
+      <label for="xp">XP Points</label>
+      <input type="number" id="xp" placeholder="">
+    </div>
+	    <div class="grid-item">
+      <label for="unis">Unis</label>
+      <input type="number" id="unis" placeholder="">
+    </div>
+	    <div class="grid-item">
+      <label for="lad_balance">LaD Balance</label>
+      <input type="number" id="lad_balance" placeholder="">
+    </div>
+  </div>
+</div>
+</div>
+   </div>     
+
+    
+  <div id="skillsColumn" class="frame-wrapper">
+		<div class="frame" id="skillsBox">
+          <h3>
+            Skills
+          </h3>
+          <div id="skillHeaders">
+            <div class="header-name">Name</div>
+            <div class="header-stat">STAT</div>
+            <div class="header-rank">Rank</div>
+            <div class="header-bonus">Bonus</div>
+			<div class="header-delete"></div>
+
+          </div>
+				<div id="skillsList">
+				</div>
+					<button type="button" id="addSkillBtn" onclick="addSkill()">Add Skill</button>
+        </div>
+  </div>
+
+
+  <div id="traitsColumn" class="frame-wrapper">
+		<div class="frame" id="traitsBox">
+			<h3>
+				Traits
+			</h3>
+				<div id="traitsList">
+    			</div>
+					<button type="button" id="addTraitBtn" onclick="addTrait()">Add Trait</button>
+		</div>
+		
+		<div class="frame" id="abilitiesBox">
+			<h3>
+				Abilities
+			</h3>
+				<div id="abilityList">
+				</div>
+					<button type="button" id="addAbilityBtn" onclick="addAbility()">Add Ability</button>
+		</div>
+   </div>
+</div>
+
+	
+
+    
+
+    
+
+    <!-- Save/Load/Print/Reset Buttons -->
+    <div id="saveLoadPrint">
+      <button onclick="saveCharacter()">Save</button>
+      <button onclick="loadCharacter()">Load</button>
+      <button onclick="window.print()">Print</button>
+      <button onclick="resetSheet()">Reset</button>
+	  <button id="switchThemeButton">Switch Theme</button>
+	
+
+
+    </div>
+	
+  </div>
+
+  </section>
+    <!--  INVENTORY PANEL  -->
+  <section id="inventory" class="tab-content">
+     <div class="sheet"> 
+    <!-- Equipment Section -->
+<div class="frame" id="equipmentBox">
+  <h3>Equipment</h3>
+<div id="equipmentHeaders">
+  <div>Name</div>
+  <div>Type</div>
+  <div>Info</div>
+  <div></div>
+</div>
+    <div id="equipmentList">
+          </div>
+
+			<button id="addEquipment" type="button" onclick="addEquipment()">Add Equipment</button>
+</div>
+
+
+   <div class="frame" id="weaponsBox">
+      <h3>Weapons</h3>
+	  <div id="weaponHeaders">
+	    <div>Name</div>
+  <div>Skill Req</div>
+  <div>DMG</div>
+  <div>Min DMG</div>
+    <div>AD</div>
+  <div>Wgt</div>
+  <div>ROF</div>
+  <div>Recoil</div>
+  <div>Range</div>
+  <div>Clip</div>
+  <div>Cost</div>
+  <div>Info</div>
+    <div></div>
+  </div>
+<div id="weaponList">
+  </div>
+	<button id="addWeapon"   type="button" onclick="addWeapon()">Add Weapon</button>
+</div>
+  
+    <div class="frame" id="armourBox">
+      <h3>Armour</h3>
+	<div id="armourHeaders" >
+	  <div>Name</div>
+  <div>PV</div>
+    <div>AR</div>
+  <div>Wgt</div>
+  <div>Info</div>
+  <div></div>
+  </div>
+<div id="armourList">
+</div>
+	<button id="addArmour"   type="button" onclick="addArmour()">Add Armour</button>
+</div>
+
+<div class="frame" id="drugBox">
+  <h3>Drugs</h3>
+  <div id="drugHeaders">
+  	  <div>Name</div>
+  <div>Effect</div>
+    <div>AR</div>
+  <div>AD</div>
+    <div>Detox</div>
+  <div>Info</div>
+  <div></div>
+  </div>
+  <div id="drugList">
+  </div>
+	<button id="addDrug"     type="button" onclick="addDrug()">Add Drug</button>
+</div>
+
+
+  </section>
+
+  <!--  NOTES PANEL  -->
+  <section id="notes" class="tab-content">
+    <div class="sheet" id="notesBox">
+	  <div class="frame">
+
+    <!-- Additional Notes -->
+
+      <h3>Additional Notes</h3>
+      <textarea style="width:100%; height:100px; padding:5px; font-size:12px; box-sizing: border-box;" placeholder="Enter any additional details..."></textarea>
+ <div id="notesPrint" class="print-only"></div>
+    
+  </div>
+    
+    </div>
+  </section>
+
+</div>
+      <div id="skillModal" class="modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; 
+     background:rgba(0,0,0,0.5); justify-content:center; align-items:center;">
+  <div class="modal-content" style="background:#fff; padding:20px; border-radius:4px; min-width:300px;">
+      <p style="font-size:12px; margin-bottom:0.5em;">
+      Increasing a skill costs:<br>
+      • 0 → 1 = 2 pts<br>
+      • 1 → 2 = 3 pts<br>
+      • 2 → 3 = 4 pts
+    </p>
+    <p>Select a skill to increase:</p>
+    <select id="skillSelect" style="width:100%; margin-bottom:10px;"></select>
+    <div style="text-align:right;">
+      <button id="cancelSkillSelect">Return to Char Sheet</button>
+      <button id="confirmSkillSelect">Increase Skill 1 Rank</button>
+	        <button type="button" id="undoSkillAllocationBtn" style="margin-left:1em;">
+        Undo Last Skill Allocation
+      </button>
+    </div>
+  </div>
+</div>
+
+  <script>
+  
+  document.getElementById("switchThemeButton").addEventListener("click", function() {
+  const theme = document.getElementById("themeStylesheet");
+  if (theme.getAttribute("href") === "styles.css") {
+    theme.setAttribute("href", "alternative.css");
+  } else {
+    theme.setAttribute("href", "styles.css");
+  }
+});
+
+    
+    /* 
+      addOrUpdateSkill() handles cumulative contributions.
+      It uses dataset attributes:
+        - data.speciesRank for species-based contributions,
+        - data.packageRank for package-based contributions,
+        - data.manualRank for manual skills.
+      The displayed rank is the sum of these values.
+    */
+    function addOrUpdateSkill(skillName, stat, rank, source) {
+     
+      let found = false;
+      const items = document.querySelectorAll("#skillsList .skill-item");
+      items.forEach(item => {
+        const skillInput = item.querySelector("input.string-field");
+        if (skillInput && skillInput.value.trim().toLowerCase() === skillName.toLowerCase()) {
+          if (source === "species") {
+            let current = parseInt(item.dataset.speciesRank) || 0;
+            current += rank;
+            item.dataset.speciesRank = current;
+          } else if (source === "package") {
+            let current = parseInt(item.dataset.packageRank) || 0;
+            current += rank;
+            item.dataset.packageRank = current;
+          } else {
+            let current = parseInt(item.dataset.manualRank) || 0;
+            current += rank;
+            item.dataset.manualRank = current;
+          }
+          let total = (parseInt(item.dataset.speciesRank) || 0) +
+                      (parseInt(item.dataset.packageRank) || 0) +
+                      (parseInt(item.dataset.manualRank) || 0);
+          item.querySelector(".skill-rank").value = total;
+          found = true;
+        }
+      });
+      if (!found) {
+        const container = document.getElementById("skillsList");
+        const newDiv = document.createElement("div");
+        newDiv.className = "skill-item";
+        if (source === "species") {
+          newDiv.dataset.speciesRank = rank;
+          newDiv.dataset.source = "species";
+        } else if (source === "package") {
+          newDiv.dataset.packageRank = rank;
+          newDiv.dataset.package = "package";
+        } else {
+          newDiv.dataset.manualRank = rank;
+        }
+        newDiv.innerHTML = `
+          <input type="text" class="string-field" placeholder="Enter Skill" value="${skillName}">
+          <input type="text" class="skill-stat" placeholder="STAT" value="${stat}">
+          <input type="number" class="skill-rank" placeholder="Rank" value="${rank}">
+          <input type="number" class="skill-bonus" placeholder="Bonus" value="0" readonly>
+          <button class="skill-delete" type="button" onclick="removeSkill(this)">Delete</button>
+        `;
+        attachSkillEventListeners(newDiv);
+        container.appendChild(newDiv);
+      }
+      updateAllSkillBonuses();
+    }
+    
+function updateStartingSkill(skillName, stat, rank, source) {
+  addOrUpdateSkill(skillName, stat, rank, source);
+  sortSkillsAlphabetically();
+}
+    function updateStartingSkillPackage(skillName, stat, rank, pkg) {
+      addOrUpdateSkill(skillName, stat, rank, "package");
+	    sortSkillsAlphabetically();
+    }
+	
+// Bonus Allocation Routine
+
+let bonusPointsAllocated = false;
+
+function allocateBonusPoints() {
+  let bonusPoints = 12;
+  const species = document.getElementById("species").value;
+  if (!species) {
+    alert("Please select a species first.");
+    return;
+  }
+  
+  // Define species-specific maximum bonus values.
+  // Extend these objects as needed.
+  const speciesMax = {
+    "Human": { str: 3, dex: 4, know: 5, conc: 5, cha: 5, cool: 5, luck: 6 },
+    "Ebonite": { str: 3, dex: 4, know: 5, conc: 6, cha: 5, cool: 5, luck: 6 },
+    "Frother":  { str: 4, dex: 4, know: 5, conc: 3, cha: 4, cool: 5, luck: 3 },
+	"Stormer 313 'Malice'": { str: 6, dex: 6, know: 2, conc: 3, cha: 3, cool: 6, luck: 2 },
+    "Stormer 711 'Xeno'": { str: 5, dex: 5, know: 3, conc: 4, cha: 2, cool: 6, luck: 2 },
+    "Shaktar":  { str: 5, dex: 5, know: 4, conc: 3, cha: 3, cool: 6, luck: 3 },
+	"Wraithen": { str: 3, dex: 6, know: 4, conc: 4, cha: 4, cool: 5, luck: 4 },
+    "ADV Carrien": { str: 5, dex: 5, know: 2, conc: 4, cha: 3, cool: 6, luck: 3 },
+    "Neophron":  { str: 2, dex: 3, know: 6, conc: 6, cha: 6, cool: 5, luck: 3 }
+    // Add additional species as needed.
+  };
+
+  const maxValues = speciesMax[species] || { str: 3, dex: 3, know: 3, conc: 3, cha: 3, cool: 3, luck: 3 };
+
+  // Define the STAT input IDs (Luck is read from "luckflux_max")
+  const statIds = ["str", "dex", "know", "conc", "cha", "cool", "luckflux_max"];
+  
+  // Capture the baseline values. For luck, we store it under the key "luck".
+  let baseline = {};
+  statIds.forEach(id => {
+    let key = (id === "luckflux_max") ? "luck" : id;
+    baseline[key] = parseInt(document.getElementById(id).value) || 0;
+  });
+  
+  // Create a copy for the allocated values.
+  let allocated = Object.assign({}, baseline);
+  
+  // Mapping from digit (as string) to the corresponding STAT key.
+  const statMapping = {
+    "1": "str",
+    "2": "dex",
+    "3": "know",
+    "4": "conc",
+    "5": "cha",
+    "6": "cool",
+    "7": "luckflux_max"  // this will update allocated.luck
+  };
+  
+  while (bonusPoints > 0) {
+    let msg = `You have ${bonusPoints} bonus point(s) remaining.\n\nCurrent STAT totals (baseline + bonus):\n`;
+    msg += `1: STR = ${allocated.str} (max ${maxValues.str})\n`;
+    msg += `2: DEX = ${allocated.dex} (max ${maxValues.dex})\n`;
+    msg += `3: KNOW = ${allocated.know} (max ${maxValues.know})\n`;
+    msg += `4: CONC = ${allocated.conc} (max ${maxValues.conc})\n`;
+    msg += `5: CHA = ${allocated.cha} (max ${maxValues.cha})\n`;
+    msg += `6: COOL = ${allocated.cool} (max ${maxValues.cool})\n`;
+    msg += `7: LUCK/FLUX = ${allocated.luck} (max ${maxValues.luck})\n\n`;
+    msg += "Enter a command: type the corresponding number to add one point, or type the number followed by '-' to subtract (e.g., '1' or '1-'). Type 'done' to finish:";
+    
+    let input = prompt(msg, "");
+    if (!input) break;
+    if (input.toLowerCase() === "done") break;
+    
+    // Allow for input in two formats:
+    // Either a digit alone (e.g., "1") [which means add one point]
+    // Or a digit followed by '-' (e.g., "1-") to subtract one point.
+    const match = input.match(/^([1-7])(-)?$/);
+    if (!match) {
+      alert("Invalid input. Please enter a digit (1–7) optionally followed by '-' (e.g., '1' or '1-').");
+      continue;
+    }
+    
+    const statNum = match[1];
+    // If there's a '-' present, op is subtract; otherwise, add.
+    const op = match[2] === "-" ? "-" : "+";
+    const statKey = statMapping[statNum];
+    // For display purposes:
+    const displayName = (statKey === "luckflux_max") ? "LUCK" : statKey.toUpperCase();
+    
+    let currentVal = (statKey === "luckflux_max") ? allocated.luck : allocated[statKey];
+    let maxAllowed = (statKey === "luckflux_max") ? maxValues.luck : maxValues[statKey];
+    let baselineVal = (statKey === "luckflux_max") ? baseline.luck : baseline[statKey];
+    
+    if (op === "+") {
+      if (currentVal >= maxAllowed) {
+        alert(`${displayName} is already at its maximum value of ${maxAllowed}.`);
+        continue;
+      }
+      allocated[statKey === "luckflux_max" ? "luck" : statKey] = currentVal + 1;
+      bonusPoints--;
+    } else if (op === "-") {
+      if (currentVal <= baselineVal) {
+        alert(`${displayName} cannot go below its baseline value of ${baselineVal}.`);
+        continue;
+      }
+      allocated[statKey === "luckflux_max" ? "luck" : statKey] = currentVal - 1;
+      bonusPoints++;
+    }
+    
+    // Update all STAT input fields.
+    statIds.forEach(id => {
+      let key = (id === "luckflux_max") ? "luck" : id;
+      if (id === "luckflux_max") {
+        document.getElementById(id).value = allocated.luck;
+      } else {
+        document.getElementById(id).value = allocated[key];
+      }
+    });
+  }
+  alert("Bonus points allocation complete.");
+  
+    // Once allocation is complete, update the flag and disable the allocation button.
+  bonusPointsAllocated = true;
+  document.getElementById("allocateBonusBtn").disabled = true;
+  document.getElementById("package").disabled = false;
+  updateHitPointMax();
+}
+
+// Attach the event listener for bonus allocation.
+document.getElementById("allocateBonusBtn").addEventListener("click", allocateBonusPoints);
+
+
+
+    
+    // Remove package contributions when package changes.
+    function removePackageContributions() {
+      const items = document.querySelectorAll("#skillsList .skill-item");
+      items.forEach(item => {
+        if (item.dataset.packageRank) {
+          item.dataset.packageRank = "0";
+          let total = (parseInt(item.dataset.speciesRank) || 0) +
+                      (parseInt(item.dataset.packageRank) || 0) +
+                      (parseInt(item.dataset.manualRank) || 0);
+          if (total === 0) { item.remove(); }
+          else { item.querySelector(".skill-rank").value = total; }
+        }
+      });
+      updateAllSkillBonuses();
+    }
+    
+    // Package dropdown event listener.
+    document.getElementById("package").addEventListener("change", function() {
+ 
+  removePackageContributions(); // Remove any previous package contributions
+  const pkg = this.value;
+
+  // Get current stat values (default to 0 if blank)
+  const str = parseInt(document.getElementById("str").value) || 0;
+  const dex = parseInt(document.getElementById("dex").value) || 0;
+  const cool = parseInt(document.getElementById("cool").value) || 0;
+  const know = parseInt(document.getElementById("know").value) || 0;
+  const conc = parseInt(document.getElementById("conc").value) || 0;
+  
+  // Initialize flags and message
+  let requirementsMet = true;
+  let requirementMessage = "";
+
+  // Check package requirements
+  if (pkg === "Close Assault") {
+    if (str < 2 || dex < 2) {
+      requirementsMet = false;
+      requirementMessage = "Close Assault requires a minimum of STR 2 and DEX 2.";
+    }
+  } else if (pkg === "Heavy Support") {
+    if (str < 2 || dex < 2) {
+      requirementsMet = false;
+      requirementMessage = "Heavy Support requires a minimum of STR 2 and DEX 2.";
+    }
+  } else if (pkg === "Scout") {
+    if (cool < 2 || dex < 2) {
+      requirementsMet = false;
+      requirementMessage = "Scout requires a minimum of COOL 2 and DEX 2.";
+    }
+  } else if (pkg === "Medic") {
+    if (know < 3) {
+      requirementsMet = false;
+      requirementMessage = "Medic requires a minimum of KNOW 3.";
+    }
+  } else if (pkg === "Investigation and Interrogation") {
+    if (know < 2 || cool < 2) {
+      requirementsMet = false;
+      requirementMessage = "Investigation and Interrogation requires a minimum of KNOW 2 and COOL 2.";
+    }
+  } else if (pkg === "Bureaucrat") {
+    if (know < 2 || cool < 2) {
+      requirementsMet = false;
+      requirementMessage = "Bureaucrat requires a minimum of KNOW 2 and COOL 2.";
+    }
+  } else if (pkg === "Technical") {
+    if (conc < 3) {
+      requirementsMet = false;
+      requirementMessage = "Technical requires a minimum of CONC 3.";
+    }
+  }
+  
+  // If requirements are not met, alert the user and reset the dropdown
+  if (!requirementsMet) {
+    alert(requirementMessage);
+	  alert(
+    "Minimum STAT requirements have *not* been met.\n\n" +
+    requirementMessage
+  );
+    this.selectedIndex = 0;
+    return;
+  }
+  
+  removePackageContributions();
+  // If requirements are met, add the skills for the package
+  if (pkg === "Strike and Sweep") {
+    // Example: add skills for Strike and Sweep
+    updateStartingSkillPackage("Athletics", "DEX", 1, pkg);
+    updateStartingSkillPackage("Detect", "CONC", 1, pkg);
+    updateStartingSkillPackage("Drive Civilian", "KNOW", 1, pkg);
+    updateStartingSkillPackage("Drive Military", "KNOW", 1, pkg);
+    updateStartingSkillPackage("Medical", "KNOW", 1, pkg);
+    updateStartingSkillPackage("Pistol", "DEX", 1, pkg);
+    updateStartingSkillPackage("Rifle", "DEX", 1, pkg);
+    let choice = prompt("Strike and Sweep: Choose one additional skill:\nEnter 1 for Melee Weapons, or 2 for Unarmed Combat", "1");
+    if (choice === "1") {
+      updateStartingSkillPackage("Melee Weapons", "STR", 1, pkg);
+    } else if (choice === "2") {
+      updateStartingSkillPackage("Unarmed Combat", "STR", 1, pkg);
+    } else {
+      updateStartingSkillPackage("Unarmed Combat", "STR", 1, pkg);
+    }
+  } else if (pkg === "Close Assault") {
+    updateStartingSkillPackage("Acrobatics", "DEX", 1, pkg);
+    updateStartingSkillPackage("Athletics", "DEX", 2, pkg);
+    updateStartingSkillPackage("Climbing", "STR", 1, pkg);
+    updateStartingSkillPackage("Stealth", "DEX", 1, pkg);
+    let choice1 = prompt("Close Assault: Choose one skill (Rank 2):\nEnter 1 for Melee Weapons, 2 for Polearms, 3 for Throw, 4 for Unarmed Combat", "1");
+    let option1 = "";
+    if (choice1 === "1") { option1 = "Melee Weapons"; }
+    else if (choice1 === "2") { option1 = "Polearms"; }
+    else if (choice1 === "3") { option1 = "Throw"; }
+    else if (choice1 === "4") { option1 = "Unarmed Combat"; }
+    if (option1) { updateStartingSkillPackage(option1, "STR", 2, pkg); }
+    let choice2 = prompt("Close Assault: Choose one additional skill (Rank 1, must differ from previous):\nEnter 1 for Melee Weapons, 2 for Polearms, 3 for Throw, 4 for Unarmed Combat", "1");
+  let option2 = "";
+do {
+  let choice2 = prompt("Close Assault: Choose one additional skill (Rank 1, must differ from the first option):\nEnter 1 for Melee Weapons, 2 for Polearms, 3 for Throw, 4 for Unarmed Combat", "1");
+  if(!choice2) {
+    // User canceled; exit loop.
+    break;
+  }
+  if(choice2 === "1") { option2 = "Melee Weapons"; }
+  else if(choice2 === "2") { option2 = "Polearms"; }
+  else if(choice2 === "3") { option2 = "Throw"; }
+  else if(choice2 === "4") { option2 = "Unarmed Combat"; }
+  else {
+    alert("Invalid choice. Please enter a number between 1 and 4.");
+    continue;
+  }
+  
+  if(option2.toLowerCase() === option1.toLowerCase()){
+    alert("You must choose a different skill than the first option. Please choose again.");
+  } else {
+    updateStartingSkillPackage(option2, "STR", 1, pkg);
+    break;
+  }
+} while(true);
+  } else if (pkg === "Heavy Support") {
+    updateStartingSkillPackage("Demolitions", "CONC", 1, pkg);
+    updateStartingSkillPackage("Rifle", "DEX", 2, pkg);
+    updateStartingSkillPackage("Support Weapons", "STR", 2, pkg);
+    updateStartingSkillPackage("Tactics", "CONC", 1, pkg);
+    updateStartingSkillPackage("Throw", "STR", 1, pkg);
+    updateStartingSkillPackage("Technical:Weapons", "CONC", 1, pkg);
+  } else if (pkg === "Scout") {
+    updateStartingSkillPackage("Detect", "CONC", 1, pkg);
+    updateStartingSkillPackage("Rifle", "DEX", 1, pkg);
+    updateStartingSkillPackage("Read Lips", "CONC", 1, pkg);
+    updateStartingSkillPackage("Stealth", "DEX", 2, pkg);
+    updateStartingSkillPackage("Survival", "COOL", 1, pkg);
+    updateStartingSkillPackage("Tracking", "CONC", 2, pkg);
+  } else if (pkg === "Medic") {
+    updateStartingSkillPackage("Computer", "KNOW", 1, pkg);
+    updateStartingSkillPackage("Detect", "CONC", 1, pkg);
+    updateStartingSkillPackage("Education: Academic", "KNOW", 1, pkg);
+    updateStartingSkillPackage("Education: Natural", "KNOW", 1, pkg);
+    updateStartingSkillPackage("Medical", "KNOW", 2, pkg);
+    updateStartingSkillPackage("Forensics", "KNOW", 2, pkg);
+  } else if (pkg === "Investigation and Interrogation") {
+    updateStartingSkillPackage("Computer", "KNOW", 1, pkg);
+    updateStartingSkillPackage("Detect", "CONC", 1, pkg);
+    updateStartingSkillPackage("Interrogate", "COOL", 2, pkg);
+    updateStartingSkillPackage("Torture", "COOL", 1, pkg);
+    updateStartingSkillPackage("Streetwise", "KNOW", 2, pkg);
+    updateStartingSkillPackage("Forensics", "KNOW", 1, pkg);
+  } else if (pkg === "Bureaucrat") {
+    updateStartingSkillPackage("Admin & Finance", "KNOW", 1, pkg);
+    updateStartingSkillPackage("Computer", "KNOW", 1, pkg);
+    updateStartingSkillPackage("Diplomacy", "CHA", 2, pkg);
+    updateStartingSkillPackage("Haggle", "CHA", 1, pkg);
+    updateStartingSkillPackage("Leadership", "CHA", 2, pkg);
+    updateStartingSkillPackage("Oratory", "CHA", 1, pkg);
+} else if (pkg === "Technical") {
+  updateStartingSkillPackage("Computer", "KNOW", 2, pkg);
+  updateStartingSkillPackage("Detect", "CONC", 1, pkg);
+  updateStartingSkillPackage("Haggle", "CHA", 1, pkg);
+  
+  let techChoice1 = prompt("Technical: Choose one Lock Pick skill:\nEnter 1 for Lock Pick:Manual or 2 for Lock Pick:Electronic", "1");
+  let optionTech1 = "";
+  if (techChoice1 === "1") { optionTech1 = "Lock Pick:Manual"; }
+  else if (techChoice1 === "2") { optionTech1 = "Lock Pick:Electronic"; }
+  if (optionTech1) { updateStartingSkillPackage(optionTech1, "CONC", 1, pkg); }
+  
+  let techChoice2 = prompt("Technical: Choose one skill (Rank 2):\nEnter 1 for Technical:Electronic, 2 for Technical:Mechanical, or 3 for Technical:Weapons", "1");
+  let optionTech2 = "";
+  if (techChoice2 === "1") { optionTech2 = "Technical:Electronic"; }
+  else if (techChoice2 === "2") { optionTech2 = "Technical:Mechanical"; }
+  else if (techChoice2 === "3") { optionTech2 = "Technical:Weapons"; }
+  if (optionTech2) { updateStartingSkillPackage(optionTech2, "CONC", 2, pkg); }
+  
+  // For the third choice, we require a different selection than techChoice2.
+  let optionTech3 = "";
+  do {
+    let techChoice3 = prompt("Technical: Choose one more skill (Rank 1, must differ from previous):\nEnter 1 for Technical:Electronic, 2 for Technical:Mechanical, or 3 for Technical:Weapons", "1");
+    if (!techChoice3) {
+      // User cancelled the prompt; exit the loop without adding a third skill.
+      break;
+    }
+    if (techChoice3 === "1") { optionTech3 = "Technical:Electronic"; }
+    else if (techChoice3 === "2") { optionTech3 = "Technical:Mechanical"; }
+    else if (techChoice3 === "3") { optionTech3 = "Technical:Weapons"; }
+    else {
+      alert("Invalid selection. Please enter a number between 1 and 3.");
+      continue;
+    }
+    
+    if (optionTech2 && optionTech2.toLowerCase() === optionTech3.toLowerCase()) {
+      alert("You must choose a different skill than the previous option. Please choose again.");
+      // Reset optionTech3 and loop again.
+      optionTech3 = "";
+      continue;
+    }
+    // If we reached here, a valid and non-duplicate option has been selected.
+    break;
+  } while (true);
+  
+  if (optionTech3) {
+    updateStartingSkillPackage(optionTech3, "CONC", 1, pkg);
+  }
+
+  }
+  
+  updateAllSkillBonuses();
+});
+
+	
+	document.getElementById("restoreHpBtn").addEventListener("click", function() {
+  const hpMax = document.getElementById("hpMax").value;
+  document.getElementById("hpCurrent").value = hpMax;
+  // Optionally, update any related functions (e.g., updateWoundsStatus) if needed.
+  updateWoundsStatus();
+});
+
+    
+    // Portrait functionality
+    const portraitArea = document.getElementById("portraitArea");
+    const portraitImg = document.getElementById("portraitImg");
+    const portraitPlaceholder = document.getElementById("portraitPlaceholder");
+    portraitArea.addEventListener("dragover", e => e.preventDefault());
+    portraitArea.addEventListener("drop", e => {
+      e.preventDefault();
+      const files = e.dataTransfer.files;
+      if (files.length) {
+        const file = files[0];
+        if (file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = event => {
+            portraitImg.src = event.target.result;
+            portraitImg.style.display = "block";
+            portraitPlaceholder.style.display = "none";
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+    });
+    portraitArea.addEventListener("click", () => {
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/*";
+      fileInput.onchange = e => {
+        const file = e.target.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = event => {
+            portraitImg.src = event.target.result;
+            portraitImg.style.display = "block";
+            portraitPlaceholder.style.display = "none";
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+      fileInput.click();
+    });
+	
+
+
+
+function updateLuckFluxLabels() {
+  const species = document.getElementById("species").value;
+  const currentLabel = document.querySelector('label[for="luckflux_current"]');
+  const maxLabel = document.querySelector('label[for="luckflux_max"]');
+  
+  if (species === "Ebonite") {
+    currentLabel.textContent = "Flux (Current):";
+    maxLabel.textContent = "Flux (Max):";
+  } else {
+    currentLabel.textContent = "Luck (Current):";
+    maxLabel.textContent = "Luck (Max):";
+  }
+}
+
+
+    
+	document.getElementById("luckflux_current").addEventListener("input", function() {
+  const maxVal = parseInt(document.getElementById("luckflux_max").value) || 0;
+  let currentVal = parseInt(this.value) || 0;
+  if (maxVal && currentVal > maxVal) {
+    this.value = maxVal;
+  }
+});
+
+document.getElementById("restoreLuckBtn").addEventListener("click", function() {
+  const maxVal = document.getElementById("luckflux_max").value;
+  document.getElementById("luckflux_current").value = maxVal;
+});
+
+
+	
+    // Wounds status update
+function updateWoundsStatus() {
+  // 1) Calculate bleeding/wounds message
+  const checkboxes = document.querySelectorAll('.wounds-item input[type="checkbox"]');
+  let count = 0;
+  checkboxes.forEach(cb => { if (cb.checked) count++; });
+  const bleedingMsg = count === 0
+    ? "No wounds"
+    : count === 1
+      ? "Bleeding - Lose 1HP every 20 mins (2HP if Haemophilia)"
+      : count === 6
+        ? "You're dead!"
+        : "Bleeding - Lose 1HP every 20 mins (2HP if Haemophilia)";
+  document.getElementById("woundsStatus").textContent = bleedingMsg;
+
+  // 2) Show critical‐condition text if HP≤6
+  const hpVal = parseInt(document.getElementById("hpCurrent").value, 10) || 0;
+  const critMsg = hpVal <= 6
+    ? "HP is at Critical Condition: -2 STR and DEX, -1 CONC and COOL"
+    : "";
+  document.getElementById("woundsCritical").textContent = critMsg;
+
+updateCriticalStats();
+
+  // 4) Recompute all skill bonuses (with temporary penalty coloring)
+  updateAllSkillBonuses();
+}
+
+// Attach the event listeners.
+document.querySelectorAll('.wounds-item input[type="checkbox"]').forEach(cb => {
+  cb.addEventListener("change", updateWoundsStatus);
+});
+document.getElementById("hpCurrent")
+        .addEventListener("input", updateWoundsStatus);
+document.querySelectorAll('.wounds-item input[type="checkbox"]')
+        .forEach(cb => cb.addEventListener("change", updateWoundsStatus));
+
+
+
+    
+function updateInitBonus() {
+  const dexVal = parseInt(document.getElementById("dex").value) || 0;
+  const concVal = parseInt(document.getElementById("conc").value) || 0;
+  let bonus = dexVal + concVal;
+  const species = document.getElementById("species").value;
+  const initBonusField = document.getElementById("initBonus");
+
+  if (species === "Wraithen") {
+    bonus += 1;
+    initBonusField.style.color = "red";
+  } else {
+    initBonusField.style.color = "black";
+  }
+  
+  initBonusField.value = bonus;
+}
+    document.getElementById("dex").addEventListener("input", updateInitBonus);
+    document.getElementById("conc").addEventListener("input", updateInitBonus);
+    
+// Update all skill bonuses based on STAT values and update movement values
+function updateAllSkillBonuses() {
+  const hp     = parseInt(document.getElementById("hpCurrent").value, 10) || 0;
+  const isCrit = hp <= 6;
+
+  document.querySelectorAll("#skillsList .skill-item").forEach(item => {
+    // Determine STAT key
+    let statKey = item.querySelector(".skill-stat").value.trim().toLowerCase();
+    if (statKey === "luck/flux" || statKey === "luckflux") {
+      statKey = "luckflux_current";
+    }
+
+    // Read the (penalized) stat value and the rank
+    const statVal = parseInt(document.getElementById(statKey).value, 10) || 0;
+    let rank      = parseInt(item.querySelector(".skill-rank").value, 10)  || 0;
+
+    // Clamp rank to statVal
+    if (rank > statVal) {
+      rank = statVal;
+      item.querySelector(".skill-rank").value = rank;
+      const name = item.querySelector("input.string-field").value || "This skill";
+      alert(`The rank for ${name} cannot exceed your ${statKey.toUpperCase()} (${statVal}).`);
+    }
+
+// 4) Compute base bonus off the (already penalized) stat
+const baseBonus = statVal + rank;
+
+// 5) Write the bonus and color it red if this stat was penalized
+const bonusField = item.querySelector(".skill-bonus");
+bonusField.value = baseBonus;
+
+// If HP≤6 and this skill uses STR/DEX/CONC/COOL, highlight in red
+if (isCrit && ["str","dex","conc","cool"].includes(statKey)) {
+  bonusField.style.color = "red";
+} else {
+  bonusField.style.color = "";
+}
+  });
+
+  // Update any other derived values
+  updateMovementValuesWithAthletics();
+}
+
+// This function checks if hpCurrent <= 6 and applies critical penalties
+function updateCriticalStats() {
+  const hpCurrent = parseInt(document.getElementById("hpCurrent").value) || 0;
+  const critical = hpCurrent <= 6;
+  const stats = [
+    { id: "str", penalty: 2 },
+    { id: "dex", penalty: 2 },
+    { id: "conc", penalty: 1 },
+    { id: "cool", penalty: 1 }
+  ];
+  stats.forEach(stat => {
+    const input = document.getElementById(stat.id);
+    if (input) {
+      if (critical) {
+        // Store the original value if not already stored.
+        if (!input.dataset.original) {
+          input.dataset.original = input.value;
+        }
+        // Calculate the new value with penalty.
+        let baseValue = parseInt(input.dataset.original) || 0;
+        let newVal = baseValue - stat.penalty;
+        input.value = newVal;
+        input.style.color = "red";
+      } else {
+        // Restore the original value if it was stored.
+        if (input.dataset.original) {
+          input.value = input.dataset.original;
+          delete input.dataset.original;
+        }
+        input.style.color = "black";
+      }
+    }
+  });
+}
+  
+  
+    function attachSkillEventListeners(skillItem) {
+      const rankField = skillItem.querySelector(".skill-rank");
+      const statField = skillItem.querySelector(".skill-stat");
+      if (rankField) { rankField.addEventListener("input", updateAllSkillBonuses); }
+      if (statField) { statField.addEventListener("input", updateAllSkillBonuses); }
+    }
+    
+   function addSkill() {
+
+  const container = document.getElementById("skillsList");
+  const newDiv = document.createElement("div");
+  newDiv.className = "skill-item";
+  newDiv.innerHTML = `
+    <input type="text" class="string-field" placeholder="Enter Skill">
+    <input type="text" class="skill-stat" placeholder="STAT">
+    <input type="number" class="skill-rank" placeholder="Rank">
+    <input type="number" class="skill-bonus" placeholder="Bonus" value="0" readonly>
+    <button class="skill-delete" type="button" onclick="removeSkill(this)">Delete</button>
+  `;
+  attachSkillEventListeners(newDiv);
+  container.appendChild(newDiv);
+  
+  // Automatically sort skills alphabetically after adding the new skill
+  sortSkillsAlphabetically();
+}
+
+function sortSkillsAlphabetically() {
+  const skillsList = document.getElementById("skillsList");
+  const skillItems = Array.from(skillsList.getElementsByClassName("skill-item"));
+  
+  // Sort based on the value in the "string-field" input
+  skillItems.sort((a, b) => {
+    const nameA = a.querySelector("input.string-field").value.toLowerCase();
+    const nameB = b.querySelector("input.string-field").value.toLowerCase();
+    return nameA.localeCompare(nameB);
+  });
+  
+  // Clear and re-append the sorted items
+  skillsList.innerHTML = "";
+  skillItems.forEach(item => skillsList.appendChild(item));
+}
+
+    
+    function removeSkill(btn) {
+
+      btn.parentNode.remove();
+      updateAllSkillBonuses();
+    }
+ function removeDynamicItem(buttonElement) {
+    // Finds the closest parent container (e.g., .equipment-item) and removes it.
+    buttonElement.closest('.equipment-item, .weapon-item, .armour-item, .drug-item').remove();
+}   
+function addEquipment() {
+    const container = document.getElementById("equipmentList");
+    const newDiv = document.createElement("div");
+    newDiv.className = "equipment-item";
+
+    // This is the corrected HTML structure
+    newDiv.innerHTML = `
+        <div class="eq-name"><input type="text" name="equipmentName"></div>
+        <div class="eq-type"><input type="text" name="equipmentType"></div>
+        <div class="eq-info"><input type="text" name="equipmentInfo"></div>
+        <div class="header-delete"><button class="delete-btn" type="button" onclick="removeDynamicItem(this)">Del</button></div>
+    `;
+    container.appendChild(newDiv);
+}
+	
+function addWeapon() {
+    const container = document.getElementById("weaponList");
+    const newDiv = document.createElement("div");
+    newDiv.className = "weapon-item";
+
+    newDiv.innerHTML = `
+        <div class="weapon-name"><input type="text" name="weaponName"></div>
+        <div class="weapon-skill"><input type="text" name="weaponSkill"></div>
+        <div class="weapon-dmg"><input type="text" name="weaponDmg"></div>
+        <div class="weapon-min-dmg"><input type="text" name="weaponMinDmg"></div>
+        <div class="weapon-ad"><input type="text" name="weaponAd"></div>
+        <div class="weapon-wgt"><input type="text" name="weaponWgt"></div>
+        <div class="weapon-rof"><input type="text" name="weaponRof"></div>
+        <div class="weapon-recoil"><input type="text" name="weaponRecoil"></div>
+        <div class="weapon-range"><input type="text" name="weaponRange"></div>
+        <div class="weapon-clip"><input type="text" name="weaponClip"></div>
+        <div class="weapon-cost"><input type="text" name="weaponCost"></div>
+        <div class="weapon-info"><input type="text" name="weaponInfo"></div>
+        <div class="header-delete"><button class="delete-btn" type="button" onclick="removeDynamicItem(this)">Del</button></div>
+    `;
+    container.appendChild(newDiv);
+}
+	
+function addArmour() {
+    const container = document.getElementById("armourList");
+    const newDiv = document.createElement("div");
+    newDiv.className = "armour-item";
+
+    newDiv.innerHTML = `
+        <div class="armour-name"><input type="text" name="armourName"></div>
+        <div class="ar-pv"><input type="text" name="armourpv"></div>
+        <div class="ar-resistance"><input type="text" name="armourresistance"></div>
+        <div class="ar-wgt"><input type="text" name="armourwgt"></div>
+        <div class="ar-info"><input type="text" name="armourInfo"></div>
+        <div class="header-delete"><button class="delete-btn" type="button" onclick="removeDynamicItem(this)">Del</button></div>
+    `;
+    container.appendChild(newDiv);
+}
+
+function addDrug() {
+    const container = document.getElementById("drugList");
+    const newDiv = document.createElement("div");
+    newDiv.className = "drug-item";
+
+    newDiv.innerHTML = `
+        <div class="drug-name"><input type="text" name="drugName"></div>
+        <div class="drug-effect"><input type="text" name="drugEffect"></div>
+        <div class="drug-ar"><input type="text" name="drugAr"></div>
+        <div class="drug-ad"><input type="text" name="drugAd"></div>
+        <div class="drug-detox"><input type="text" name="drugDetox"></div>
+        <div class="drug-info"><input type="text" name="drugInfo"></div>
+        <div class="header-delete"><button class="delete-btn" type="button" onclick="removeDynamicItem(this)">Del</button></div>
+    `;
+    container.appendChild(newDiv);
+}
+	
+    function addTrait() {
+  const container = document.getElementById("traitsList");
+  const newDiv = document.createElement("div");
+  newDiv.className = "trait-item";
+  newDiv.innerHTML = `
+    <input type="text" class="string-field" placeholder="Trait Name"  style="width:200px;">
+    <input type="number" class="trait-rank" placeholder="Rank">
+    <button type="button" onclick="removeTrait(this)">Delete</button>
+  `;
+  container.appendChild(newDiv);
+}
+
+function removeTrait(btn) {
+  btn.parentNode.remove();
+}
+
+
+ function addAbility() {
+  const container = document.getElementById("abilityList");
+  const newDiv = document.createElement("div");
+  newDiv.className = "ability-item";
+  newDiv.innerHTML = `
+    <input type="text" class="string-field" placeholder="Ability Name"  style="width:200px;">
+    <input type="number" class="ability-rank" placeholder="Rank">
+    <button type="button" onclick="removeAbility(this)">Delete</button>
+  `;
+  container.appendChild(newDiv);
+}
+function removeAbility(btn) {
+  btn.parentNode.remove();
+}
+
+   
+	
+    ["str", "dex", "know", "conc", "cha", "cool", "luckflux_current"].forEach(id => {
+      const statInput = document.getElementById(id);
+      if (statInput) {
+        statInput.addEventListener("input", () => {
+          updateAllSkillBonuses();
+          if (id === "dex" || id === "conc") { updateInitBonus(); }
+        });
+      }
+    });
+	
+	document.getElementById("hpCurrent").addEventListener("input", function() {
+  const hpMaxVal = parseInt(document.getElementById("hpMax").value) || 0;
+  let currentVal = parseInt(this.value) || 0;
+  if (hpMaxVal && currentVal > hpMaxVal) {
+    this.value = hpMaxVal;
+  }
+});
+
+	function updateHitPointMax() {
+  var speciesSelect = document.getElementById("species");
+  var selectedOption = speciesSelect.options[speciesSelect.selectedIndex];
+  var baseHP = parseInt(selectedOption.getAttribute("data-basehp")) || 0;
+  var strVal = parseInt(document.getElementById("str").value) || 0;
+  var newMax = baseHP + strVal;
+  document.getElementById("hpMax").value = newMax;
+  
+  // Set the max attribute on hpCurrent to prevent exceeding hpMax
+  document.getElementById("hpCurrent").max = newMax;
+}
+   
+
+// ————— Print-time auto-lock/unlock —————
+  // remember if *we* locked for print
+  let listsLockedByPrint = false;
+
+  window.addEventListener('beforeprint', () => {
+    const lockIcon = document.getElementById('globalLockToggle');
+    // if it’s currently unlocked (🔓), click to lock
+    if (lockIcon.textContent === '🔓') {
+      lockIcon.click();
+      listsLockedByPrint = true;
+    }
+  });
+
+  window.addEventListener('afterprint', () => {
+    const lockIcon = document.getElementById('globalLockToggle');
+    // if *we* locked it for printing and it’s still locked (🔒), click to unlock
+    if (listsLockedByPrint && lockIcon.textContent === '🔒') {
+      lockIcon.click();
+      listsLockedByPrint = false;
+    }
+  });
+   
+   function getValueOrPlaceholder(input) {
+  const v = input.value.trim();
+  // if there's a real value, use it; otherwise fall back to the placeholder (or empty)
+  return v !== "" ? v : (input.placeholder || "");
+}
+async function saveCharacter() {
+  const data = {};
+
+  // --- Basics & Vitals & Stats & UI-state ---
+  const fields = [
+    "name","scl","species","package","squad",
+    "initBonus","hpCurrent","hpMax",
+    "body","brains","bravado",
+    "str","dex","know","conc","cha","cool",
+    "luckflux_current","luckflux_max",
+    "move_closing","move_rushing",
+    "credits","xp","unis","lad_balance",
+    "enc_current","enc_max"
+  ];
+  fields.forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    data[id] = el.type === "checkbox"
+      ? el.checked
+      : el.value.trim();
+  });
+
+  // --- Step checkboxes ---
+  for (let i = 1; i <= 6; i++) {
+    data[`step${i}`] = document.getElementById(`step${i}`).checked;
+  }
+
+  // --- Character Creation panel collapsed? ---
+  const cc = document.getElementById("characterCreation");
+  data.characterCreationCollapsed =
+    window.getComputedStyle(cc).display === "none";
+
+  // --- Active tab & lock & theme ---
+  data.activeTab = document.querySelector(".tab-button.active").dataset.tab;
+  data.globalLock = (document.getElementById("globalLockToggle").textContent === "🔒");
+  data.theme = document.getElementById("themeStylesheet").getAttribute("href");
+
+  // --- Wounds ---
+  data.wounds = {};
+  ["wound-head","wound-torso","wound-left-arm","wound-right-arm","wound-left-leg","wound-right-leg"]
+    .forEach(id => {
+      const cb = document.getElementById(id);
+      if (cb) data.wounds[id] = cb.checked;
+    });
+
+  // --- Portrait ---
+  const portraitImg = document.getElementById("portraitImg");
+  data.portrait = portraitImg.src.startsWith("data:")
+    ? portraitImg.src
+    : "";
+
+  // --- Skills (with separate ranks & baseRank) ---
+  data.skills = Array.from(document.querySelectorAll("#skillsList .skill-item"))
+    .map(item => ({
+      name:        item.querySelector("input.string-field").value.trim(),
+      stat:        item.querySelector("input.skill-stat").value.trim(),
+      rank:        item.querySelector("input.skill-rank").value.trim(),
+      bonus:       item.querySelector("input.skill-bonus").value.trim(),
+      pkg:         item.dataset.package     || null,
+      src:         item.dataset.source      || null,
+      speciesRank: item.dataset.speciesRank || "0",
+      packageRank: item.dataset.packageRank || "0",
+      manualRank:  item.dataset.manualRank  || "0",
+      baseRank:    item.getAttribute("data-baseRank") || item.querySelector("input.skill-rank").value.trim()
+    }));
+
+  // --- Traits, Abilities, Equipment, Weapons, Armour, Drugs ---
+  data.traits    = Array.from(document.querySelectorAll("#traitsList .trait-item")).map(item => ({
+    name: item.querySelector("input.string-field").value.trim(),
+    rank: item.querySelector("input.trait-rank").value.trim()
+  }));
+  data.abilities = Array.from(document.querySelectorAll("#abilityList .ability-item")).map(item => ({
+    name: item.querySelector("input.string-field").value.trim(),
+    rank: item.querySelector("input.ability-rank").value.trim()
+  }));
+data.equipment = Array.from(
+  document.querySelectorAll("#equipmentList .equipment-item")
+)
+.filter(item => item.querySelector('input[name="equipmentName"]'))
+.map(item => {
+  const f = sel => item.querySelector(sel);
+  return {
+    name: getValueOrPlaceholder(f('input[name="equipmentName"]')),
+    type: getValueOrPlaceholder(f('input[name="equipmentType"]')),
+    info: getValueOrPlaceholder(f('input[name="equipmentInfo"]')),
+  };
+});
+
+data.weapons = Array.from(document.querySelectorAll("#weaponList .weapon-item"))
+.filter(item => item.querySelector('input[name="weaponName"]'))
+  .map(item => {
+    const f = sel => item.querySelector(sel);
+    return {
+      name:   getValueOrPlaceholder(f('input[name="weaponName"]')),
+      skill:  getValueOrPlaceholder(f('input[name="weaponSkill"]')),
+      dmg:    getValueOrPlaceholder(f('input[name="weaponDmg"]')),
+      minDmg: getValueOrPlaceholder(f('input[name="weaponMinDmg"]')),
+      AD:     getValueOrPlaceholder(f('input[name="weaponAd"]')),
+      Wgt:    getValueOrPlaceholder(f('input[name="weaponWgt"]')),
+      ROF:    getValueOrPlaceholder(f('input[name="weaponRof"]')),
+      Recoil: getValueOrPlaceholder(f('input[name="weaponRecoil"]')),
+      Range:  getValueOrPlaceholder(f('input[name="weaponRange"]')),
+      Clip:   getValueOrPlaceholder(f('input[name="weaponClip"]')),
+      Cost:   getValueOrPlaceholder(f('input[name="weaponCost"]')),
+      Info:   getValueOrPlaceholder(f('input[name="weaponInfo"]')),
+    };
+  });
+
+data.armour = Array.from(document.querySelectorAll("#armourList .armour-item"))
+.filter(item => item.querySelector('input[name="armourName"]'))
+  .map(item => {
+    const f = sel => item.querySelector(sel);
+    return {
+      name:       getValueOrPlaceholder(f('input[name="armourName"]')),
+      PV:         getValueOrPlaceholder(f('input[name="armourpv"]')),
+      Resistance: getValueOrPlaceholder(f('input[name="armourresistance"]')),
+      Wgt:        getValueOrPlaceholder(f('input[name="armourwgt"]')),
+	  Info:        getValueOrPlaceholder(f('input[name="armourInfo"]')),
+    };
+  });
+
+data.drugs = Array.from(document.querySelectorAll("#drugList .drug-item"))
+.filter(item => item.querySelector('input[name="drugName"]'))
+  .map(item => {
+    const f = sel => item.querySelector(sel);
+    return {
+      name:         getValueOrPlaceholder(f('input[name="drugName"]')),
+      effect:       getValueOrPlaceholder(f('input[name="drugEffect"]')),
+      AR:           getValueOrPlaceholder(f('input[name="drugAr"]')),
+      AD:           getValueOrPlaceholder(f('input[name="drugAd"]')),
+      detoxEffects: getValueOrPlaceholder(f('input[name="drugDetox"]')),
+      info:         getValueOrPlaceholder(f('input[name="drugInfo"]')),
+    };
+  });
+  // --- Notes ---
+  data.notes = document.querySelector("#notesBox textarea").value.trim();
+  // 2) Feature-detect the new API
+  const json = JSON.stringify(data, null, 2);
+
+  // If the File System Access API is available, go straight to it:
+  if (window.showSaveFilePicker) {
+    try {
+      const handle = await window.showSaveFilePicker({
+        suggestedName: "character.json",
+        startIn:       "documents",
+        types: [{
+          description: "SLA Character Sheet (JSON)",
+          accept: { "application/json": [".json"] }
+        }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(json);
+      await writable.close();
+      return alert("Character saved successfully!");
+    }
+    catch (err) {
+      // User hit “Cancel” (AbortError / NotAllowedError)?
+      if (err.name === "AbortError" || err.name === "NotAllowedError") {
+        return alert("Save cancelled.");
+      }
+      console.warn("Unexpected error in showSaveFilePicker:", err);
+      // fall back to download below
+    }
+  }
+
+  // --- fallback for browsers without File System Access API ---
+  let filename = prompt("Save as…", "character.json");
+  if (!filename) return alert("Save cancelled.");
+  if (!filename.toLowerCase().endsWith(".json")) filename += ".json";
+
+  const blob = new Blob([json], { type: "application/json" });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement("a");
+  a.href     = url;
+  a.download = filename;
+  document.body.append(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+  alert("Character saved via download!");
+}
+
+function loadCharacter() {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "application/json";
+  input.onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => {
+      let data;
+      try { data = JSON.parse(ev.target.result); }
+      catch {
+        return alert("Invalid JSON.");
+      }
+
+      // --- Basics & Stats & UI ---
+      const simpleFields = [
+        "name","scl","species","package","squad",
+        "initBonus","hpCurrent","hpMax",
+        "body","brains","bravado",
+        "str","dex","know","conc","cha","cool",
+        "luckflux_current","luckflux_max",
+        "move_closing","move_rushing",
+        "credits","xp","unis","lad_balance",
+        "enc_current","enc_max"
+      ];
+      simpleFields.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.value = data[id] ?? el.value;
+      });
+
+      // --- Steps & panel ---
+      for (let i = 1; i <= 6; i++) {
+        document.getElementById(`step${i}`).checked = !!data[`step${i}`];
+      }
+      const cc = document.getElementById("characterCreation");
+      cc.style.display = data.characterCreationCollapsed ? "none" : "flex";
+
+      // --- Tabs, lock, theme ---
+      document.querySelectorAll(".tab-button").forEach(b => {
+        b.classList.toggle("active", b.dataset.tab === data.activeTab);
+      });
+      document.querySelectorAll(".tab-content").forEach(p => {
+        p.classList.toggle("active", p.id === data.activeTab);
+      });
+      document.getElementById("globalLockToggle").textContent = data.globalLock ? "🔒" : "🔓";
+      // re-run lock handler once to hide/show the add/delete buttons
+      document.getElementById("globalLockToggle").dispatchEvent(new Event("click"));
+      document.getElementById("themeStylesheet").href = data.theme || "styles.css";
+
+      // --- Wounds ---
+      if (data.wounds) {
+        Object.entries(data.wounds).forEach(([id, chk]) => {
+          const cb = document.getElementById(id);
+          if (cb) cb.checked = chk;
+        });
+      }
+// --- Equipment ---
+const eqList = document.getElementById("equipmentList");
+eqList.innerHTML = "";
+(data.equipment || []).forEach(eq => {
+  const div = document.createElement("div");
+  div.className = "equipment-item";
+  div.innerHTML = `
+    <div class="eq-name">
+      <input type="text" name="equipmentName" value="${eq.name}">
+    </div>
+    <div class="eq-type">
+      <input type="text" name="equipmentType" value="${eq.type}">
+    </div>
+    <div class="eq-info">
+      <input type="text" name="equipmentInfo" value="${eq.info}">
+    </div>
+    <div class="header-delete">
+      <button class="delete-btn" type="button" onclick="removeDynamicItem(this)">Del</button>
+    </div>
+  `;
+  eqList.appendChild(div);
+});
+
+// --- Weapons ---
+const wpList = document.getElementById("weaponList");
+wpList.innerHTML = "";
+(data.weapons || []).forEach(wp => {
+  const div = document.createElement("div");
+  div.className = "weapon-item";
+  div.innerHTML = `
+    <div class="weapon-name">
+      <input type="text" name="weaponName" value="${wp.name}">
+    </div>
+    <div class="weapon-skill">
+      <input type="text" name="weaponSkill" value="${wp.skill}">
+    </div>
+	    <div class="weapon-DMG">
+      <input type="text" name="weaponDmg" value="${wp.dmg}">
+    </div>
+	    <div class="weapon-min-dmg">
+      <input type="text" name="weaponMinDmg" value="${wp.minDmg}">
+    </div>
+	    <div class="weapon-AD">
+      <input type="text" name="weaponAd" value="${wp.AD}">
+    </div>
+	    <div class="weapon-Wgt">
+      <input type="text" name="weaponWgt" value="${wp.Wgt}">
+    </div>
+	    <div class="weapon-ROF">
+      <input type="text" name="weaponRof" value="${wp.ROF}">
+    </div>
+	    <div class="weapon-recoil">
+      <input type="text" name="weaponRecoil"  value="${wp.Recoil}">
+    </div>
+	    <div class="weapon-range">
+      <input type="text" name="weaponRange" value="${wp.Range}">
+    </div>
+	    <div class="weapon-clip">
+      <input type="text" name="weaponClip" value="${wp.Clip}">
+    </div>
+	    <div class="weapon-Cost">
+      <input type="text" name="weaponCost" value="${wp.Cost}">
+    </div>
+	    <div class="weapon-info">
+      <input type="text" name="weaponInfo" value="${wp.Info}">
+    </div>
+
+    <div class="header-delete">
+      <button class="delete-btn" type="button" onclick="removeDynamicItem(this)">Del</button>
+    </div>
+  `;
+  wpList.appendChild(div);
+});
+
+// --- Armour ---
+const arList = document.getElementById("armourList");
+arList.innerHTML = "";
+(data.armour || []).forEach(ar => {
+  const div = document.createElement("div");
+  div.className = "armour-item";
+  div.innerHTML = `
+    <div class="armour-name">
+      <input type="text" name="armourName" value="${ar.name}">
+    </div>
+    <div class="ar-pv">
+      <input type="text" name="armourpv" value="${ar.PV}">
+    </div>
+    <div class="ar-resistance">
+      <input type="text" name="armourresistance" value="${ar.Resistance}">
+    </div>
+    <div class="ar-wgt">
+      <input type="text" name="armourwgt" value="${ar.Wgt}">
+    </div>
+    <div class="ar-info">
+      <input type="text" name="armourInfo" value="${ar.Info}">
+    </div>
+    <div class="header-delete">
+      <button class="delete-btn" type="button" onclick="removeDynamicItem(this)">Del</button>
+    </div>
+  `;
+  arList.appendChild(div);
+});
+
+// --- Drugs ---
+const drList = document.getElementById("drugList");
+drList.innerHTML = "";
+(data.drugs || []).forEach(dr => {
+  const div = document.createElement("div");
+  div.className = "drug-item";
+  div.innerHTML = `
+    <div class="drug-name">
+      <input type="text" name="drugName" value="${dr.name}">
+    </div>
+    <div class="drug-effect">
+      <input type="text" name="drugEffect" value="${dr.effect}">
+    </div>
+	    <div class="drug-ar">
+      <input type="text" name="drugAr" value="${dr.AR}">
+    </div>
+	    <div class="drug-ad">
+      <input type="text" name="drugAd" value="${dr.AD}">
+    </div>
+	    <div class="drug-detox">
+      <input type="text" name="drugDetox" value="${dr.detoxEffects}">
+    </div>
+    <div class="drug-info">
+      <input type="text" name="drugInfo" value="${dr.info}">
+    </div>
+    <div class="header-delete">
+      <button class="delete-btn" type="button" onclick="removeDynamicItem(this)">Del</button>
+    </div>
+  `;
+  drList.appendChild(div);
+});
+
+// --- Traits ---
+const trList = document.getElementById("traitsList");
+trList.innerHTML = "";
+(data.traits || []).forEach(tr => {
+  const div = document.createElement("div");
+  div.className = "trait-item";
+  div.innerHTML = `
+    <input type="text" class="string-field" value="${tr.name}">
+    <input type="number" class="trait-rank" value="${tr.rank}">
+    <button type="button" onclick="removeTrait(this)">Delete</button>
+  `;
+  trList.appendChild(div);
+});
+
+// --- Abilities ---
+const abList = document.getElementById("abilityList");
+abList.innerHTML = "";
+(data.abilities || []).forEach(ab => {
+  const div = document.createElement("div");
+  div.className = "ability-item";
+  div.innerHTML = `
+    <input type="text" class="string-field" value="${ab.name}">
+    <input type="number" class="ability-rank" value="${ab.rank}">
+    <button type="button" onclick="removeAbility(this)">Delete</button>
+  `;
+  abList.appendChild(div);
+});
+      // --- Portrait placeholder & src ---
+      const img = document.getElementById("portraitImg");
+      const ph = document.getElementById("portraitPlaceholder");
+      if (data.portrait) {
+        img.src = data.portrait;
+        img.style.display = "block";
+        ph.style.display = "none";
+      } else {
+        img.style.display = "none";
+        ph.style.display = "block";
+      }
+
+      // --- Skills rebuild ---
+      const skillsList = document.getElementById("skillsList");
+      skillsList.innerHTML = "";
+      (data.skills||[]).forEach(s => {
+        const div = document.createElement("div");
+        div.className = "skill-item";
+        if (s.pkg)         div.dataset.package    = s.pkg;
+        if (s.src)         div.dataset.source     = s.src;
+        if (s.speciesRank) div.dataset.speciesRank = s.speciesRank;
+        if (s.packageRank) div.dataset.packageRank = s.packageRank;
+        if (s.manualRank)  div.dataset.manualRank  = s.manualRank;
+        div.setAttribute("data-baseRank", s.baseRank);
+        div.innerHTML = `
+          <input type="text" class="string-field" value="${s.name}">
+          <input type="text" class="skill-stat"  value="${s.stat}">
+          <input type="number" class="skill-rank" value="${s.rank}">
+          <input type="number" class="skill-bonus" value="${s.bonus}" readonly>
+          <button class="skill-delete" onclick="removeSkill(this)">Delete</button>
+        `;
+        attachSkillEventListeners(div);
+        skillsList.appendChild(div);
+      });
+
+      // --- Traits, Abilities, Equipment, Weapons, Armour, Drugs ---
+      // (similarly rebuild each list exactly as in your save routine)
+      // … for brevity, I’ll assume you copy/paste your existing load loops here …
+
+      // --- Notes ---
+      document.querySelector("#notesBox textarea").value = data.notes || "";
+
+      // --- Recompute everything ---
+      updateInitBonus();
+      updateAllSkillBonuses();
+      updateWoundsStatus();
+      updateHitPointMax();
+      updateLuckFluxLabels();
+      updateMovementValuesWithAthletics();
+      updateEncMax();
+
+      alert("Character loaded!");
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+}
+	
+        // New approach for updating Max Hit Points using the data-basehp attribute on species options.
+    function updateHitPointMax() {
+      var speciesSelect = document.getElementById("species");
+      var selectedOption = speciesSelect.options[speciesSelect.selectedIndex];
+      // Read the base HP from the data-basehp attribute
+      var baseHP = parseInt(selectedOption.getAttribute("data-basehp")) || 0;
+      var strVal = parseInt(document.getElementById("str").value) || 0;
+      document.getElementById("hpMax").value = baseHP + strVal;
+    }
+    
+    // Event listeners for updating HP max when Species or STR change.
+    document.getElementById("species").addEventListener("change", function() {
+      // (Your existing species update code goes here.)
+      updateHitPointMax();
+    });
+    document.getElementById("str").addEventListener("input", updateHitPointMax);
+	
+// Reset entire sheet (including portrait)
+function resetSheet() {
+  if (!confirm("Are you sure you want to reset the character sheet? This will clear all data.")) return;
+  
+  // Reset all input fields
+  document.querySelectorAll("input").forEach(el => {
+    if (el.type === "text" || el.type === "number" || el.type === "file") { 
+      // For the hpCurrent field, reset to default "8"
+      if (el.id === "hpCurrent") {
+        el.value = "8";
+      } else {
+        el.value = "";
+      }
+      // Remove any stored data attributes (for stats, for example)
+      delete el.dataset.original;
+      // Reset the text color to black
+      el.style.color = "black";
+    } else if (el.type === "checkbox") { 
+      el.checked = false; 
+	    // 1) Clear any saved JSON in local/session storage (if you’re using it)
+  localStorage.clear();
+  sessionStorage.clear();
+
+  // 2) Force a reload that bypasses the browser cache
+  //    (in modern browsers the boolean parameter is ignored, but it’s still common to include it)
+  window.location.reload(true);
+    }
+  });
+  
+  // Reset select elements and textareas
+  document.querySelectorAll("select").forEach(el => { el.selectedIndex = 0; });
+  document.querySelectorAll("textarea").forEach(el => { el.value = ""; });
+  
+  // Explicitly reset stat fields to 0
+  const statIds = ["str", "dex", "know", "conc", "cha", "cool", "luckflux_current", "luckflux_max"];
+  statIds.forEach(id => {
+    const statInput = document.getElementById(id);
+    if (statInput) {
+      statInput.value = 0;
+      delete statInput.dataset.original;
+      statInput.style.color = "black";
+    }
+  });
+  
+  // Clear skills and equipment lists
+  document.getElementById("skillsList").innerHTML = "";
+  document.getElementById("equipmentList").innerHTML = "";
+    document.getElementById("weaponList").innerHTML = "";
+	  document.getElementById("armourList").innerHTML = "";
+	    document.getElementById("drugList").innerHTML = "";
+		  document.getElementById("traitList").innerHTML = "";
+		    document.getElementById("abilityList").innerHTML = "";
+  
+  // Reset portrait: clear src and reset display.
+  document.getElementById("portraitImg").src = "";
+  document.getElementById("portraitImg").style.display = "none";
+  document.getElementById("portraitPlaceholder").style.display = "block";
+  
+  // Re-hide the current HP field if needed.
+  document.getElementById("hpCurrent").classList.add("hidden");
+  
+  // Update any calculations after resetting
+  updateInitBonus();
+  updateAllSkillBonuses();
+  updateWoundsStatus();
+  updateHitPointMax();
+  updateLuckFluxLabels();
+  updateMovementValuesWithAthletics();
+  updateEncMax();
+  
+  // Reset bonus allocation state:
+  bonusPointsAllocated = false;
+  document.getElementById("allocateBonusBtn").disabled = false;
+    // Reset the species skills flag and re-enable the button
+  speciesSkillsAdded = false;
+  document.getElementById("addSpeciesSkillsBtn").disabled = false;
+  // Also re-enable the packages dropdown:
+  document.getElementById("package").disabled = true;
+  
+  alert("Reset complete.");
+}
+
+    document.getElementById("species").addEventListener("change", function() {
+  updateHitPointMax();
+});
+document.getElementById("str").addEventListener("input", updateHitPointMax);
+
+// Returns an object with base values for movement
+function getBaseMovementValues() {
+  const species = document.getElementById("species").value;
+  let baseClosing, baseRushing;
+  switch (species) {
+    case "Human":
+    case "Frother":
+    case "Ebonite":
+    case "Neophron":
+      baseClosing = 2;
+      baseRushing = 5;
+      break;
+    case "Stormer 313 'Malice'":
+      baseClosing = 3;
+      baseRushing = 6;
+      break;
+    case "Stormer 711 'Xeno'":
+      baseClosing = 4;
+      baseRushing = 6;
+      break;
+    case "Shaktar":
+      baseClosing = 3;
+      baseRushing = 6;
+      break;
+    case "Wraithen":
+      baseClosing = 4;
+      baseRushing = 8;
+      break;
+    case "ADV Carrien":
+      baseClosing = 4;
+      baseRushing = 7;
+      break;
+    default:
+      baseClosing = "";
+      baseRushing = "";
+  }
+  return { baseClosing, baseRushing };
+}
+
+// ——— one‐click lock/unlock for Character & Inventory lists ———
+;(function(){
+  let listsLocked = false;
+  const lockIcon = document.getElementById("globalLockToggle");
+
+  function setInventoryLocked(show){
+    // Types must match your addXxx IDs and list container IDs:
+    const types = [
+      { btn: "addEquipment",    list: "equipmentList", itemClass: "equipment-item" },
+      { btn: "addWeapon",       list: "weaponList",    itemClass: "weapon-item"    },
+      { btn: "addArmour",       list: "armourList",    itemClass: "armour-item"    },
+      { btn: "addDrug",         list: "drugList",      itemClass: "drug-item"      }
+    ];
+    types.forEach(t => {
+      const addBtn = document.getElementById(t.btn);
+      if (addBtn) addBtn.style.display = show ? "" : "none";
+      document.querySelectorAll(`#${t.list} .${t.itemClass} button`)
+              .forEach(btn => btn.style.display = show ? "" : "none");
+    });
+  }
+
+  lockIcon.addEventListener("click", () => {
+    listsLocked = !listsLocked;
+    lockIcon.textContent = listsLocked ? "🔒" : "🔓";
+
+    // Character tab lists (Skills, Traits, Abilities)
+    document.getElementById("addSkillBtn").style.display       = listsLocked ? "none" : "";
+    document.querySelectorAll("#skillsList .skill-delete")    .forEach(b=> b.style.display = listsLocked ? "none" : "");
+    document.getElementById("addTraitBtn").style.display       = listsLocked ? "none" : "";
+    document.querySelectorAll("#traitsList .trait-item button").forEach(b=> b.style.display = listsLocked ? "none" : "");
+    document.getElementById("addAbilityBtn").style.display     = listsLocked ? "none" : "";
+    document.querySelectorAll("#abilityList .ability-item button").forEach(b=> b.style.display = listsLocked ? "none" : "");
+
+    // *** New: Inventory tab lists ***
+    setInventoryLocked(!listsLocked);
+  });
+
+  // Print‐time auto-lock/unlock (already in your code)
+  let listsLockedByPrint = false;
+  window.addEventListener('beforeprint', () => {
+    if (lockIcon.textContent === '🔓') {
+      lockIcon.click();
+      listsLockedByPrint = true;
+    }
+  });
+  window.addEventListener('afterprint', () => {
+    if (listsLockedByPrint && lockIcon.textContent === '🔒') {
+      lockIcon.click();
+      listsLockedByPrint = false;
+    }
+  });
+})();
+
+
+
+// Updates movement fields: first sets the base values, then adds an Athletics bonus.
+function updateMovementValuesWithAthletics() {
+  const { baseClosing, baseRushing } = getBaseMovementValues();
+  document.getElementById("move_closing").value = baseClosing;
+
+  // Find the Athletics skill from the skills list.
+  let athleticsRank = 0;
+  const skillItems = Array.from(document.querySelectorAll("#skillsList .skill-item"));
+  skillItems.forEach(item => {
+    const nameInput = item.querySelector("input.string-field");
+    if (nameInput && nameInput.value.trim().toLowerCase() === "athletics") {
+      athleticsRank = parseInt(item.querySelector("input.skill-rank").value) || 0;
+    }
+  });
+  // Bonus: one extra rushing point for every 2 points in Athletics (rounded down)
+  const bonus = Math.floor(athleticsRank / 2);
+  document.getElementById("move_rushing").value = baseRushing + bonus;
+}
+
+let speciesSkillsAdded = false;
+
+function addSpeciesSkills() {
+  // First, make sure bonus points have been allocated.
+  if (!bonusPointsAllocated) {
+    alert("Please allocate your bonus points first using the 'Allocate Stats' button.");
+    return;
+  }
+  
+  if (speciesSkillsAdded) {
+    alert("Species skills have already been added.");
+    return;
+  }
+  
+  const species = document.getElementById("species").value;
+  if (!species) {
+    alert("Please select a species.");
+    return;
+  }
+  
+  // Now, based on the selected species, add the relevant skills.
+  // (You may want to adjust the skill names, associated STAT and ranks as needed.)
+  if (species === "Human") {
+    // Add species-based skills:
+    updateStartingSkill("Detect", "CONC", 1, "species");
+    updateStartingSkill("Education: Academic", "KNOW", 1, "species");
+    updateStartingSkill("Streetwise", "KNOW", 1, "species");
+    updateStartingSkill("Unarmed Combat", "STR", 1, "species");
+  }
+  else if (species === "Frother") {
+    updateStartingSkill("Detect", "CONC", 1, "species");
+    updateStartingSkill("Melee Weapons", "STR", 1, "species");
+    updateStartingSkill("Streetwise", "KNOW", 1, "species");
+    updateStartingSkill("Unarmed Combat", "STR", 1, "species");
+      } else if (species === "Ebonite") {
+        updateStartingSkill("Detect", "CONC", 1, "species");
+        updateStartingSkill("Education: Academic", "KNOW", 1, "species");
+      } else if (species === "Stormer 313 'Malice'") {
+        updateStartingSkill("Athletics", "DEX", 1, "species");
+        updateStartingSkill("Intimidate", "COOL", 1, "species");
+        updateStartingSkill("Throw", "STR", 1, "species");
+        updateStartingSkill("Unarmed Combat", "STR", 1, "species");
+      } else if (species === "Stormer 711 'Xeno'") {
+        updateStartingSkill("Climbing", "DEX", 1, "species");
+        updateStartingSkill("Stealth", "DEX", 1, "species");
+        updateStartingSkill("Unarmed Combat", "STR", 1, "species");
+      } else if (species === "Shaktar") {
+        updateStartingSkill("Climbing", "STR", 1, "species");
+        updateStartingSkill("Detect", "CONC", 1, "species");
+        updateStartingSkill("Survival", "COOL", 1, "species");
+        updateStartingSkill("Unarmed Combat", "STR", 1, "species");
+        updateStartingSkill("Language: Shaktarian", "KNOW", 1, "species");
+      } else if (species === "Wraithen") {
+        updateStartingSkill("Language: Wraithen", "KNOW", 1, "species");
+        updateStartingSkill("Tracking", "CONC", 1, "species");
+        updateStartingSkill("Unarmed Combat", "STR", 1, "species");
+        updateStartingSkill("Athletics", "DEX", 1, "species");
+      } else if (species === "ADV Carrien") {
+        updateStartingSkill("Survival", "COOL", 1, "species");
+        updateStartingSkill("Unarmed Combat", "STR", 1, "species");
+        updateStartingSkill("Language: Gristle", "KNOW", 1, "species");
+        updateStartingSkill("Intimidate", "COOL", 1, "species");
+        updateStartingSkill("Lore: Sector", "KNOW", 1, "species");
+      } else if (species === "Neophron") {
+        updateStartingSkill("Education: Academic", "KNOW", 1, "species");
+        updateStartingSkill("Education: Natural", "KNOW", 1, "species");
+        updateStartingSkill("Bribery", "COOL", 1, "species");
+        updateStartingSkill("Diplomacy", "CHA", 1, "species");
+        updateStartingSkill("Leadership", "CHA", 1, "species");
+        updateStartingSkill("Language: Neophron", "KNOW", 1, "species");
+        updateStartingSkill("Language: Choice", "KNOW", 1, "species");
+        updateStartingSkill("Oratory", "KNOW", 1, "species");
+        updateStartingSkill("Persuasion", "CHA", 1, "species");
+	}
+  // ... include additional species cases as needed ...
+  else {
+    alert("No species skills defined for the selected species.");
+    return;
+  }
+  
+  // Once the species skills have been added, set the flag and disable the button.
+  speciesSkillsAdded = true;
+  document.getElementById("addSpeciesSkillsBtn").disabled = true;
+  alert("Species skills are about to be added.");
+}
+
+// Attach the event listener for the species skills button.
+document.getElementById("addSpeciesSkillsBtn").addEventListener("click", addSpeciesSkills);
+
+	
+    // Species dropdown event listener – remove only species contributions and add new ones.
+    document.getElementById("species").addEventListener("change", function() {
+
+      const species = this.value;
+      const items = document.querySelectorAll("#skillsList .skill-item");
+      items.forEach(item => {
+        if (item.dataset.speciesRank) {
+          item.dataset.speciesRank = "0";
+          let total = (parseInt(item.dataset.speciesRank) || 0) +
+                      (parseInt(item.dataset.packageRank) || 0) +
+                      (parseInt(item.dataset.manualRank) || 0);
+          if (total === 0) { item.remove(); }
+          else { item.querySelector(".skill-rank").value = total; }
+        }
+      });
+      if (species === "Human") {
+        document.getElementById("str").value = 1;
+        document.getElementById("dex").value = 1;
+        document.getElementById("conc").value = 1;
+        document.getElementById("know").value = 2;
+        document.getElementById("cha").value = 1;
+        document.getElementById("cool").value = 1;
+        document.getElementById("luckflux_current").value = 1;
+        document.getElementById("luckflux_max").value = 1;
+
+      } else if (species === "Frother") {
+        document.getElementById("str").value = 2;
+        document.getElementById("dex").value = 2;
+        document.getElementById("conc").value = 1;
+        document.getElementById("know").value = 2;
+        document.getElementById("cha").value = 0;
+        document.getElementById("cool").value = 1;
+        document.getElementById("luckflux_current").value = 1;
+        document.getElementById("luckflux_max").value = 1;
+
+      } else if (species === "Ebonite") {
+        document.getElementById("str").value = 0;
+        document.getElementById("dex").value = 1;
+        document.getElementById("conc").value = 2;
+        document.getElementById("know").value = 1;
+        document.getElementById("cha").value = 1;
+        document.getElementById("cool").value = 1;
+        document.getElementById("luckflux_current").value = 2;
+        document.getElementById("luckflux_max").value = 2;
+
+      } else if (species === "Stormer 313 'Malice'") {
+        document.getElementById("str").value = 3;
+        document.getElementById("dex").value = 2;
+        document.getElementById("conc").value = 0;
+        document.getElementById("know").value = 0;
+        document.getElementById("cha").value = 0;
+        document.getElementById("cool").value = 3;
+        document.getElementById("luckflux_current").value = 0;
+        document.getElementById("luckflux_max").value = 0;
+
+      } else if (species === "Stormer 711 'Xeno'") {
+        document.getElementById("str").value = 2;
+        document.getElementById("dex").value = 3;
+        document.getElementById("conc").value = 1;
+        document.getElementById("know").value = 0;
+        document.getElementById("cha").value = 0;
+        document.getElementById("cool").value = 2;
+        document.getElementById("luckflux_current").value = 0;
+        document.getElementById("luckflux_max").value = 0;
+
+      } else if (species === "Shaktar") {
+        document.getElementById("str").value = 3;
+        document.getElementById("dex").value = 2;
+        document.getElementById("conc").value = 0;
+        document.getElementById("know").value = 1;
+        document.getElementById("cha").value = 1;
+        document.getElementById("cool").value = 1;
+        document.getElementById("luckflux_current").value = 0;
+        document.getElementById("luckflux_max").value = 0;
+
+      } else if (species === "Wraithen") {
+        document.getElementById("str").value = 1;
+        document.getElementById("dex").value = 3;
+        document.getElementById("conc").value = 1;
+        document.getElementById("know").value = 1;
+        document.getElementById("cha").value = 1;
+        document.getElementById("cool").value = 0;
+        document.getElementById("luckflux_current").value = 1;
+        document.getElementById("luckflux_max").value = 1;
+
+      } else if (species === "ADV Carrien") {
+        document.getElementById("str").value = 3;
+        document.getElementById("dex").value = 1;
+        document.getElementById("conc").value = 1;
+        document.getElementById("know").value = 0;
+        document.getElementById("cha").value = 0;
+        document.getElementById("cool").value = 3;
+        document.getElementById("luckflux_current").value = 0;
+        document.getElementById("luckflux_max").value = 0;
+
+      } else if (species === "Neophron") {
+        document.getElementById("str").value = 0;
+        document.getElementById("dex").value = 0;
+        document.getElementById("conc").value = 2;
+        document.getElementById("know").value = 2;
+        document.getElementById("cha").value = 3;
+        document.getElementById("cool").value = 1;
+        document.getElementById("luckflux_current").value = 0;
+        document.getElementById("luckflux_max").value = 0;
+
+      }
+      updateInitBonus();
+      updateAllSkillBonuses();
+    });
+	
+// Global variables for the skill point allocation stage
+const totalSkillPoints = 30;         // Total points available
+let skillPointsRemaining = totalSkillPoints; // Points remaining to allocate
+let allocationHistory = [0];         // History of points used; initially 0
+
+// Event listener to capture base ranks and start the allocation routine
+document.getElementById("allocateSkillPointsBtn").addEventListener("click", function () {
+  initializeBaseRanks();
+  startSkillAllocation();
+});
+
+// Function to update the displayed points used (i.e. total allocated)
+// It shows: points used = totalSkillPoints - skillPointsRemaining
+function updatePointsDisplay() {
+  const pointsUsed = totalSkillPoints - skillPointsRemaining;
+  document.getElementById("pointsRemainingDisplay").value = pointsUsed;
+}
+
+
+
+// Undo function – removes the last allocation and restores its cost
+document.getElementById("undoSkillAllocationBtn").addEventListener("click", function () {
+  if (allocationHistory.length === 0) {
+    alert("There is no allocation to undo.");
+    return;
+  }
+  const lastAllocation = allocationHistory.pop();
+  let skillItem = findSkillItem(lastAllocation.skillName);
+  if (skillItem) {
+    let rankInput = skillItem.querySelector(".skill-rank");
+    rankInput.value = lastAllocation.previousRank;
+    skillPointsRemaining += lastAllocation.cost;
+    alert(`Undid allocation for ${lastAllocation.skillName}. Points restored: ${lastAllocation.cost}\nPoints available: ${skillPointsRemaining}`);
+    updatePointsDisplay();
+    if (skillPointsRemaining > 0) {
+      document.getElementById("allocateSkillPointsBtn").disabled = false;
+    }
+  }
+});
+
+// (Optional) Helper function if you need to update any additional UI element with points remaining.
+// This function is currently not used because updatePointsDisplay() handles the number field.
+<!-- function updatePointsRemainingDisplay() {
+<!--   document.getElementById("pointsRemainingDisplay").textContent =
+<!--     "Points used: " + (totalSkillPoints - skillPointsRemaining);
+<!-- } --> --> --> -->
+// (Optional) If you previously used updateAllocationButtonStatus to lock the button based on another button's state,
+// you can remove that function since we want the allocate button unlocked by default.
+
+// Function to find a skill item by its name in the skills list.
+function findSkillItem(skillName) {
+  const skillItems = document.querySelectorAll("#skillsList .skill-item");
+  for (let item of skillItems) {
+    const nameInput = item.querySelector("input.string-field");
+    if (nameInput && nameInput.value.trim().toLowerCase() === skillName.toLowerCase()) {
+      return item;
+    }
+  }
+  return null;
+}
+
+// Function to compute the cost based on current rank.
+function costForNextRank(currentRank) {
+  if (currentRank === 0) return 2;
+  if (currentRank === 1) return 3;
+  if (currentRank === 2) return 4;
+  return Infinity; // Should never allow rank beyond 3
+}
+
+// Function to populate and show the skill selection modal.
+// The callback receives the selected skill name, or null if cancelled.
+function showSkillSelectionModal(callback) {
+  // Get all skill names from the skills list.
+  const selectEl = document.getElementById("skillSelect");
+  selectEl.innerHTML = "";
+  const skillItems = document.querySelectorAll("#skillsList .skill-item");
+  skillItems.forEach(item => {
+    const nameInput = item.querySelector("input.string-field");
+    if (nameInput && nameInput.value.trim() !== "") {
+      const option = document.createElement("option");
+      option.value = nameInput.value;
+      option.textContent = nameInput.value;
+      selectEl.appendChild(option);
+    }
+  });
+  
+  // If no skills are found, alert and call back with null.
+  if (selectEl.options.length === 0) {
+    alert("No skills found. Please add skills to the list first.");
+    callback(null);
+    return;
+  }
+  
+  // Show the modal.
+  const modal = document.getElementById("skillModal");
+  modal.style.display = "flex";
+  
+  // Set up the OK and Cancel buttons.
+  const confirmBtn = document.getElementById("confirmSkillSelect");
+  const cancelBtn = document.getElementById("cancelSkillSelect");
+  
+  // Remove any previous event listeners.
+  confirmBtn.onclick = null;
+  cancelBtn.onclick = null;
+  
+  confirmBtn.onclick = function () {
+    const selectedSkill = selectEl.value;
+    modal.style.display = "none";
+    callback(selectedSkill);
+  };
+  
+  cancelBtn.onclick = function () {
+    modal.style.display = "none";
+    callback(null);
+  };
+}
+
+// This function starts the allocation routine recursively.
+function startSkillAllocation() {
+  // If no points remain, disable the button and exit.
+  if (skillPointsRemaining  <= 0) {
+    alert("All points have been allocated.");
+    document.getElementById("allocateSkillPointsBtn").disabled = true;
+    return;
+  }
+  
+  
+  // Show the modal for skill selection.
+  showSkillSelectionModal(function(selectedSkill) {
+    // If user cancels the modal, simply exit the routine.
+    if (!selectedSkill) return;
+    
+    let skillItem = findSkillItem(selectedSkill);
+    if (!skillItem) {
+      alert("Skill not found. Please check the list and try again.");
+      // Re-open the modal for another selection.
+      startSkillAllocation();
+      return;
+    }
+    
+    // Get current rank from the skill item.
+    let rankInput = skillItem.querySelector(".skill-rank");
+    let currentRank = parseInt(rankInput.value) || 0;
+    if (currentRank >= 3) {
+      alert("This skill is already at the maximum rank (3).");
+      startSkillAllocation();
+      return;
+    }
+    // ——— Prevent raising above governing stat ———
+  const statName = skillItem
+    .querySelector(".skill-stat")
+    .value
+    .trim()
+    .toLowerCase();
+  const key = (statName === "luck/flux" || statName === "luckflux")
+    ? "luckflux_current"
+    : statName;
+  const govStatVal = parseInt(
+    document.getElementById(key).value,
+    10
+  ) || 0;
+  if (currentRank + 1 > govStatVal) {
+    alert(
+      `Cannot increase ${selectedSkill} above its governing stat (${govStatVal}).`
+    );
+    // re-open allocation modal
+    startSkillAllocation();
+    return;
+  }
+    // Determine the cost for the next rank increase.
+    let cost = costForNextRank(currentRank);
+    if (skillPointsRemaining  < cost) {
+      alert(`Not enough points. Increasing from rank ${currentRank} to ${currentRank + 1} costs ${cost} points.`);
+      startSkillAllocation();
+      return;
+    }
+    
+    // Increase the skill's rank.
+    rankInput.value = currentRank + 1;
+    skillPointsRemaining  -= cost;
+    allocationHistory.push({ skillName: selectedSkill, previousRank: currentRank, cost });
+    alert(`Increased ${selectedSkill} to rank ${currentRank + 1}.\nPoints remaining: ${skillPointsRemaining }`);
+	
+	  updatePointsDisplay();
+    
+    // If points remain, automatically reopen the modal.
+    if (skillPointsRemaining  > 0) {
+      startSkillAllocation();
+    } else {
+      alert("All points have been allocated.");
+      document.getElementById("allocateSkillPointsBtn").disabled = true;
+    }
+  });
+}
+
+
+
+// Function to initialize base rank for each skill if not already set.
+function initializeBaseRanks() {
+  const skillItems = document.querySelectorAll("#skillsList .skill-item");
+  skillItems.forEach(item => {
+    const rankInput = item.querySelector(".skill-rank");
+    if (!item.hasAttribute("data-baseRank")) {
+      // Store the current rank as the base rank.
+      item.setAttribute("data-baseRank", rankInput.value || 0);
+    }
+  });
+}
+
+// Toggle checklist visibility
+document.getElementById("toggleContainersBtn").addEventListener("click", function() {
+  const panel = document.getElementById("characterCreation");
+  // use computed style in case display wasn't set inline
+  const isVisible = window.getComputedStyle(panel).display !== "none";
+
+  // if it’s currently visible, we’re about to hide it → restore values
+  if (isVisible) {
+    document.getElementById("restoreHpBtn").click();
+    document.getElementById("restoreLuckBtn").click();
+  }
+
+  // toggle visibility
+  panel.style.display = isVisible ? "none" : "flex";
+});
+
+// Step 1: enable Allocate Stats when species selected
+document.getElementById("species").addEventListener("change", () => {
+  const hasSpecies = !!document.getElementById("species").value;
+  document.getElementById("step1").checked = hasSpecies;
+  document.getElementById("allocateBonusBtn").disabled = !hasSpecies;
+});
+
+// Step 2: mark when Allocate Stats clicked
+document.getElementById("allocateBonusBtn").addEventListener("click", () => {
+  document.getElementById("step2").checked = true;
+  document.getElementById("addSpeciesSkillsBtn").disabled = false;
+});
+
+// Step 3: mark when Add Species Skills clicked
+document.getElementById("addSpeciesSkillsBtn").addEventListener("click", () => {
+  document.getElementById("step3").checked = true;
+});
+
+// Step 4: mark when package selected
+document.getElementById("package").addEventListener("change", () => {
+  const hasPackage = !!document.getElementById("package").value;
+  document.getElementById("step4").checked = hasPackage;
+  document.getElementById("allocateSkillPointsBtn").disabled = !hasPackage;
+  // initialize display to full points when enabled
+  if (hasPackage) {
+    document.getElementById("pointsRemainingDisplay").value = 30;
+  }
+});
+
+// Observe when Allocate Skill Points button becomes disabled (i.e. process complete)
+const allocateBtn = document.getElementById("allocateSkillPointsBtn");
+const step5Chk = document.getElementById("step5");
+const observer = new MutationObserver(mutations => {
+  mutations.forEach(m => {
+    if (m.attributeName === 'disabled' && allocateBtn.disabled) {
+      step5Chk.checked = true;
+    }
+  });
+});
+observer.observe(allocateBtn, { attributes: true });
+
+// (Your original allocation routine – startSkillAllocation & updatePointsDisplay – remains unchanged)
+// But ensure updatePointsDisplay() writes into the #pointsRemainingDisplay field
+
+
+  // Bridge original allocation logic to update checklist display
+  allocateBtn.addEventListener("click", () => {
+    // After original handler runs, original code will repeatedly call updatePointsDisplay,
+    // which updates the pointsRemainingDisplay input. No extra code needed here.
+  });
+
+  // When the "Start Ratings Points" button is clicked, check Step 6 and show panel
+  document.getElementById('startRatingsStepBtn').addEventListener('click', () => {
+    const chk = document.getElementById('step6');
+    chk.checked = true;
+    startRatingsStep(); // initializes and shows the Step 6 UI
+  });
+
+  // Show/hide the Step 6 panel when the checkbox toggles
+  document.getElementById('step6').addEventListener('change', function(e) {
+    const panel = document.getElementById('ratingsPointsStep');
+    panel.style.display = e.target.checked ? 'flex' : 'none';
+  });
+
+// Reset button to restart the allocation stage and restore skills to their base ranks.
+document.getElementById("resetSkillAllocationBtn").addEventListener("click", function () {
+  if (!confirm("Are you sure you want to reset the skill allocation stage? This will remove all manual increases and restore base ranks.")) return;
+  
+  // Reset the allocation pool and history.
+  skillPointsRemaining  = 30;
+  allocationHistory = [];
+  
+  // Restore each skill's rank to its saved base rank.
+  const skillItems = document.querySelectorAll("#skillsList .skill-item");
+  skillItems.forEach(item => {
+    const rankInput = item.querySelector(".skill-rank");
+    let baseRank = parseInt(item.getAttribute("data-baseRank")) || 0;
+    rankInput.value = baseRank;
+  });
+  
+  // Re-enable the allocation button.
+  document.getElementById("allocateSkillPointsBtn").disabled = false;
+    updatePointsDisplay();
+  alert("Skill allocation has been reset. Manual increases have been removed and skills restored to their base ranks. You now have 30 points to allocate.");
+});
+
+
+	function updateEncMax() {
+  // Use Number() to convert to a number; if it's not a valid number, default to 0.
+  const strVal = Number(document.getElementById("str").value) || 0;
+  const encMax = Math.max(8, strVal * 3);
+  document.getElementById("enc_max").value = encMax;
+}
+
+document.getElementById("str").addEventListener("input", updateEncMax);
+
+document.getElementById("species").addEventListener("change", function() {
+  updateHitPointMax();
+  updateLuckFluxLabels();
+  updateMovementValuesWithAthletics();
+  updateEncMax();
+  // Set current hit points equal to max hit points
+    document.getElementById("hpCurrent").classList.remove("hidden");
+  document.getElementById("hpCurrent").value = document.getElementById("hpMax").value;
+});
+
+  // —— draggable modal logic ——
+  (function() {
+    const modalContent = document.querySelector('#skillModal .modal-content');
+    let isDragging = false;
+    let offsetX = 0;
+    let offsetY = 0;
+
+    // Make it absolutely positioned and give it a move cursor
+    modalContent.style.position = 'absolute';
+    modalContent.style.top = '50%';
+    modalContent.style.left = '50%';
+    modalContent.style.transform = 'translate(-50%, -50%)';
+    modalContent.style.cursor = 'move';
+
+    modalContent.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      // compute offset within the box where you clicked
+      const rect = modalContent.getBoundingClientRect();
+      offsetX = e.clientX - rect.left;
+      offsetY = e.clientY - rect.top;
+      // disable text‐selection while dragging
+      document.body.style.userSelect = 'none';
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      // position so that your initial click stays under the cursor
+      const x = e.clientX - offsetX;
+      const y = e.clientY - offsetY;
+      modalContent.style.left = `${x}px`;
+      modalContent.style.top = `${y}px`;
+      modalContent.style.transform = ''; // clear the centering transform
+    });
+
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        document.body.style.userSelect = ''; // re‐enable text selection
+      }
+    });
+  })();
+  (function() {
+    const modal = document.getElementById('skillModal');
+    const dialog = modal.querySelector('.modal-content');
+
+    // State for dragging
+    let isDragging = false;
+    let startX = 0, startY = 0;
+    let origLeft = 0, origTop = 0;
+
+    // 1) Center the modal in px (no transform)
+    function centerInViewport() {
+      dialog.style.position = 'absolute';
+      const rect = dialog.getBoundingClientRect();
+      dialog.style.left = (window.innerWidth - rect.width) / 2 + 'px';
+      dialog.style.top  = (window.innerHeight - rect.height) / 2 + 'px';
+    }
+
+    // whenever Bootstrap shows the modal, re-center it
+    modal.addEventListener('shown.bs.modal', centerInViewport);
+
+    // 2) On mousedown, lock in where you clicked and where the box was
+    dialog.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX;
+      startY = e.clientY;
+      const style = getComputedStyle(dialog);
+      origLeft = parseFloat(style.left);
+      origTop  = parseFloat(style.top);
+      document.body.style.userSelect = 'none';  // prevent text selection
+    });
+
+    // 3) While moving, shift the box by exactly the mouse delta
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      dialog.style.left = origLeft + dx + 'px';
+      dialog.style.top  = origTop  + dy + 'px';
+    });
+
+    // 4) On mouseup, stop dragging
+    document.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        document.body.style.userSelect = '';
+      }
+    });
+  })();
+  
+ document.addEventListener("DOMContentLoaded", ()=>{
+
+  const cats    = ["Body","Brain","Bravado"];
+  const totals  = { Body:0, Brain:0, Bravado:0 };
+  const initRP  = { Body:0, Brain:0, Bravado:0 };
+  const extraRP = { Body:0, Brain:0, Bravado:0 };
+  let   remaining = 3;
+
+  const modal = document.getElementById("rpTieModal");
+  const title = modal.querySelector(".modal-title");
+  const fg    = modal.querySelector(".first-group");
+  const sg    = modal.querySelector(".second-group");
+  const submitBtn = document.getElementById("rpTieSubmit");
+  
+  /**
+ * Disable any “second” radio whose value === the chosen “first”,
+ * and vice versa, so you can't pick the same category twice.
+ */
+modal.addEventListener("change", () => {
+  const firstSel  = modal.querySelector('input[name="first"]:checked')?.value;
+  const secondSel = modal.querySelector('input[name="second"]:checked')?.value;
+
+  // grey-out any “second” option equal to firstSel
+  modal.querySelectorAll('input[name="second"]').forEach(radio => {
+    radio.disabled = (radio.value === firstSel);
+  });
+
+  // grey-out any “first” option equal to secondSel
+  modal.querySelectorAll('input[name="first"]').forEach(radio => {
+    radio.disabled = (radio.value === secondSel);
+  });
+});
+
+  function updateTotalsUI(){
+    document.getElementById("bodyTotal").textContent    = totals.Body;
+    document.getElementById("brainTotal").textContent   = totals.Brain;
+    document.getElementById("bravadoTotal").textContent = totals.Bravado;
+  }
+  function updateRPinitUI(){
+    cats.forEach(cat=>{
+      document.getElementById(cat.toLowerCase()+"InitRP").value = initRP[cat];
+      document.getElementById(cat.toLowerCase()+"Extra").textContent = extraRP[cat];
+    });
+    document.getElementById("rpRemaining").textContent = remaining;
+  }
+  function calcTotals(){
+    totals.Body    = +document.getElementById("str").value  + +document.getElementById("dex").value;
+    totals.Brain   = +document.getElementById("know").value + +document.getElementById("conc").value;
+    totals.Bravado = +document.getElementById("cha").value  + +document.getElementById("cool").value;
+    updateTotalsUI();
+  }
+
+  function assignInitialRP(){
+    cats.forEach(c=> initRP[c]=0);
+    calcTotals();
+    const sorted = cats.slice().sort((a,b)=> totals[b]-totals[a]);
+    const [first,second,third] = sorted;
+    const top = totals[first], mid = totals[second], bot = totals[third];
+
+    // no tie
+    if(top>mid && mid>bot){
+      initRP[first]=2; initRP[second]=1;
+      updateRPinitUI();
+      return;
+    }
+
+    // tie → build modal
+    fg.innerHTML = ""; sg.innerHTML = "";
+    modal.style.display = "flex";
+
+    // top-tie?
+    if(top===mid && top>bot){
+      title.textContent = 
+        `Tie for highest between ${first} & ${second}.\n`+
+        `Choose which gets 2 RP; the other gets 1, ${third} gets 0.`;
+      [first,second].forEach(cat=>{
+        fg.innerHTML +=
+          `<label><input type="radio" name="first" value="${cat}"> ${cat} = 2 RP</label>`;
+      });
+      sg.style.display = "none";
+      return;
+    }
+
+    // bottom-tie?
+    if(mid===bot && top>mid){
+      initRP[first]=2;
+      title.textContent = 
+        `Tie for lowest between ${second} & ${third}.\n`+
+        `${first} gets 2 RP; choose which gets 1, the other 0.`;
+      fg.style.display = "none";
+      [second,third].forEach(cat=>{
+        sg.innerHTML +=
+          `<label><input type="radio" name="second" value="${cat}"> ${cat} = 1 RP</label>`;
+      });
+      return;
+    }
+
+    // three-way tie
+    title.textContent =
+      `All three tied.\nSelect who gets 2 RP and who gets 1 RP; the last gets 0.`;
+    sorted.forEach(cat=>{
+      fg.innerHTML +=
+        `<label><input type="radio" name="first"  value="${cat}"> ${cat} = 2 RP</label>`;
+      sg.innerHTML +=
+        `<label><input type="radio" name="second" value="${cat}"> ${cat} = 1 RP</label>`;
+    });
+  }
+
+  // now that the DOM is ready, wire up the Apply button
+  submitBtn.addEventListener("click", ()=>{
+    const twoCat = document.querySelector('input[name="first"]:checked')?.value;
+    const oneCat = document.querySelector('input[name="second"]:checked')?.value;
+    if(twoCat) initRP[twoCat]=2;
+    if(oneCat) initRP[oneCat]=1;
+    cats.forEach(cat=>{ if(initRP[cat]!==2 && initRP[cat]!==1) initRP[cat]=0; });
+    modal.style.display="none";
+    updateRPinitUI();
+  });
+
+  // expose your “start” function
+  window.startRatingsStep = function(){
+    assignInitialRP();
+    remaining = 3;
+    cats.forEach(c=> extraRP[c]=0);
+    document.getElementById("ratingsPointsStep").style.display="flex";
+  };
+
+
+  // 4) Extra‐point spending
+  document.querySelectorAll(".rp-add").forEach(btn =>
+    btn.addEventListener("click", () => {
+      const cat = btn.dataset.cat;
+      if (remaining>0 && extraRP[cat]<2) {
+        extraRP[cat]++; remaining--;
+        updateRPinitUI();
+      }
+    })
+  );
+  document.querySelectorAll(".rp-rem").forEach(btn =>
+    btn.addEventListener("click", () => {
+      const cat = btn.dataset.cat;
+      if (extraRP[cat]>0) {
+        extraRP[cat]--; remaining++;
+        updateRPinitUI();
+      }
+    })
+  );
+
+  // 5) Confirm and record
+  document.getElementById('confirmRpBtn').addEventListener('click', () => {
+  // compute final RP per category
+  const finalBody   = parseInt(document.getElementById('bodyInitRP').value, 10)
+                      + parseInt(document.getElementById('bodyExtra').textContent, 10);
+  const finalBrain  = parseInt(document.getElementById('brainInitRP').value, 10)
+                      + parseInt(document.getElementById('brainExtra').textContent, 10);
+  const finalBravado= parseInt(document.getElementById('bravadoInitRP').value, 10)
+                      + parseInt(document.getElementById('bravadoExtra').textContent, 10);
+
+  // write them back into the sheet
+  document.getElementById('body').value    = finalBody;
+  document.getElementById('brains').value  = finalBrain;
+  document.getElementById('bravado').value = finalBravado;
+
+  // (optional) hide Step 6 panel
+  document.getElementById('ratingsPointsStep').style.display = 'none';
+});
+
+  // 6) Public API: call this to *show* Step 6
+  window.startRatingsStep = function() {
+    calcTotals();
+    assignInitialRP();
+    remaining = 3;
+    cats.forEach(c=>extraRP[c]=0);
+    document.getElementById("ratingsPointsStep").style.display = "flex";
+    updateRPinitUI();
+  };
+});
+
+document.querySelectorAll('.tab-button').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const tabName = btn.dataset.tab;
+
+    // 1) Toggle active button
+    document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+
+    // 2) Show the matching tab, hide the others
+    document.querySelectorAll('.tab-content').forEach(pane => {
+      pane.classList.toggle('active', pane.id === tabName);
+    });
+  });
+});
+document.addEventListener('DOMContentLoaded', () => {
+  // ensure at least 7 blanks in each list:
+  const targets = [
+    { listId: 'equipmentList', addFn: addEquipment },
+    { listId: 'weaponList',    addFn: addWeapon    },
+    { listId: 'armourList',    addFn: addArmour    },
+    { listId: 'drugList',      addFn: addDrug      },
+  ];
+
+  targets.forEach(({ listId, addFn }) => {
+    const list = document.getElementById(listId);
+    // call the corresponding adder until we hit 7 children
+    for (let i = list.children.length; i < 7; i++) {
+      addFn();
+    }
+  });
+  window.addEventListener('beforeprint', () => {
+  const ta  = document.querySelector('#notesBox textarea');
+  const div = document.getElementById('notesPrint');
+  div.textContent = ta.value;   // copy all lines
+});
+});
+(function(){
+  const speciesEl = document.getElementById('species');
+  const packageEl = document.getElementById('package');
+  let cleared = [];
+
+  window.addEventListener('beforeprint', () => {
+    [speciesEl, packageEl].forEach(el => {
+      if (el.value === "") {
+        // remember and hide its text
+        cleared.push(el);
+        el.style.color = 'transparent';
+      }
+    });
+  });
+
+  window.addEventListener('afterprint', () => {
+    // restore the color
+    cleared.forEach(el => el.style.color = '');
+    cleared = [];
+  });
+})();
+(function(){
+  const ccPanel  = document.getElementById('characterCreation');
+  const lockIcon = document.getElementById('globalLockToggle');
+
+  // remember what things were before printing
+  let wasCCVisible, wasLocked;
+
+  window.addEventListener('beforeprint', () => {
+    // 1) hide the character-creation checklist
+    wasCCVisible = window.getComputedStyle(ccPanel).display !== 'none';
+    ccPanel.style.display = 'none';
+
+    // 2) if it’s not already locked, click it to lock
+    wasLocked = (lockIcon.textContent === '🔒');
+    if (!wasLocked) lockIcon.click();
+  });
+
+  window.addEventListener('afterprint', () => {
+    // restore the panel’s visibility
+    if (wasCCVisible) ccPanel.style.display = 'flex';
+
+    // unlock again if we auto-locked
+    if (!wasLocked && lockIcon.textContent === '🔒') lockIcon.click();
+  });
+})();
+  </script>
+</body>
+</html>

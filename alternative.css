@@ -1,0 +1,1072 @@
+/* General Layout */
+body {
+  background-color: #333;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+}
+.sheet {
+  background-color: #fff;
+  width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 3px solid #333;
+  box-shadow: 3px 3px 10px rgba(0,0,0,0.5);
+}
+h1, h2, h3 {
+  margin: 0 0 10px;
+  color: #333;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+
+}
+
+.header-image {
+  /* Set the image height to match the h1 height */
+  height: 70px;  /* Alternatively, adjust to match your design, e.g., 100% or a specific pixel value */
+
+}
+
+.corner-image {
+  /* Set the image height to match the h1 height */
+  height: 200px;  /* Alternatively, adjust to match your design, e.g., 100% or a specific pixel value */
+
+}
+/* make header+tabs a single horizontal bar */
+.sheet-header {
+  display: flex;
+  align-items: center;
+  padding: 0.5em;
+  background: #fff;
+}
+.sheet-header .header-image {
+  height: 50px;
+  margin-right: 1em;
+}
+.sheet-header h1 {
+  color: #d7d5d7;
+  margin: 0;
+  font-size: 1.5em;
+}
+.sheet-header .tabs {
+  margin-left: auto;
+}
+
+/* hide all panels by default */
+.tab-content {
+  display: none;
+}
+/* show only the active one */
+.tab-content.active {
+  display: block;
+}
+
+/* Position the new Character Creation container at the top right corner */
+#characterCreation {
+
+  top: 10px;      /* Adjust this value as needed to align with your title */
+
+  display: flex;
+  flex-wrap: wrap; /* Allow items to wrap if needed */
+  align-items: center; /* Vertically center items */
+  gap: 5px;       /* Space between elements */
+  background: #f8f8f8; /* Optional: a light background for contrast */
+  padding: 5px;
+  border: 1px solid #ccc; /* Optional border */
+  z-index: 100;  /* Ensure it sits on top of other elements */
+}
+
+/* Style the toggle container at the bottom */
+#toggleContainerWrapper {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-100%);
+}
+
+/* Frame styling */
+.frame {
+  border: 2px solid #555;
+  background-color: #fff;
+  padding: 10px;
+  margin-bottom: 5px;
+  position: relative;
+}
+.frame h3,
+.block-header {
+  margin-top: 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #2c252d;
+  border-bottom: 1px solid #555;
+  padding: 5px;
+  text-align: left;
+}
+
+
+
+/* Header container for Clearance Card */
+.header-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.lad-account {
+	position: absolute;
+  right: 15px;
+  top: 240px;
+  font-size: 14px;
+}
+.lad-account input {
+  margin-right: 5px;
+}
+
+.number-field {
+  width: 60px;
+  padding: 5px;
+  font-size: 12px;
+  border: 1px solid #999;
+  background-color: #fff;
+  margin-right: 5px;
+}
+
+.field-group {
+  display: flex;
+  align-items: center;
+}
+
+.field-group label {
+  margin-right: 10px; /* Adjust spacing as needed */
+}
+
+/* Top Container */
+#topContainer {
+  display: grid;
+  grid-template-columns: 50% 15% 25%;
+  gap: 1rem;                /* space between columns */
+
+  box-sizing: border-box;
+}
+
+
+/* Vitals Box styling */
+#vitalsBox .block-header {
+  margin-bottom: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #fff;
+}
+#vitalsBox .field-group { margin-bottom: 8px; }
+#vitalsBox label {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 3px;
+}
+#vitalsBox input[type="number"] {
+  width: 100%;
+  padding: 5px;
+  font-size: 12px;
+  box-sizing: border-box;
+  border: 1px solid #999;
+  background-color: #fff;
+}
+/* Vitals: label above input */
+#vitalsBox .field-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;   /* make sure the inputs line up on the left */
+  margin-bottom: 1em;        /* a little breathing room between rows */
+}
+
+#vitalsBox .field-group label {
+  margin-bottom: 0.25em;     /* space between label and its input */
+  font-weight: bold;         /* optional, makes the labels stand out */
+}
+
+#clearanceCard .info-fields {
+      padding-right: 220px; /* 150px portrait width + 20px gap */
+      text-align: right;
+}
+
+/* Clearance-Card: put every label above its input/select, left-aligned */
+#clearanceCard .info-fields label {
+  display: block;
+  text-align: left;
+  margin-bottom: 0.25em;
+  font-weight: 500;    /* optional, makes the “header” label stand out */
+}
+
+/* Clearance Card styling */
+#clearanceCard .portrait {
+  position: absolute;
+  right: 30px;
+  top: 5px;
+  width: 150px;
+  height: 150px;
+  border: 2px solid #333;
+  background-color: #eee;
+  overflow: hidden;
+  text-align: center;
+  line-height: 150px;
+  font-size: 12px;
+  color: #666;
+  cursor: pointer;
+}
+#portraitImg {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: none;
+}
+#portraitPlaceholder { display: block; }
+
+/* Personal Info & Fields */
+.string-field {
+  width: 250px;
+  padding: 5px;
+  font-size: 12px;
+  border: 1px solid #999;
+  margin-bottom: 10px;
+  background-color: #fff;
+}
+.dropdown {
+  width: 265px;
+  padding: 5px;
+  font-size: 12px;
+  border: 1px solid #999;
+  margin-bottom: 10px;
+  background-color: #fff;
+}
+
+/* Name and SCL container */
+
+.scl-box {
+	position: absolute;
+  right: 57px;
+  top: 160px;
+  font-size: 24px;
+  width: 120px;
+  height: 70px;
+  border: 2px solid #999;
+  display: inline-block;
+}
+.scl-box input {
+  width: 100%;
+  height: 100%;
+  font-size: 50px;
+  text-align: center;
+  border: none;
+  background: transparent;
+}
+
+.hp-container {
+  display: flex;
+  align-items: center;
+}
+
+.hidden {
+  display: none;
+}
+
+.hp-container #restoreHpBtn {
+  font-size: 8px;
+  margin-left: 5px;
+  padding: 2px 5px;
+  /* Ensure it fits within the frame */
+  max-height: 100%;
+  cursor: pointer;
+}
+#threeColumn {
+  display: grid;
+  grid-template-columns: 25% 40% 30%;
+  gap: 1rem;                /* space between columns */
+  width: 100%;              /* full‐page width */
+  box-sizing: border-box;
+  align-items: stretch; 
+}
+
+
+/* 1) Skills column: make its single .frame fill the column height */
+#skillsColumn {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+#skillsColumn .frame {
+  flex: 1 1 auto;                   /* ← stretch to fill */
+  box-sizing: border-box;
+}
+
+/* 2) Traits column: split into two equal‐height rows */
+#traitsColumn {
+  display: grid;
+  grid-template-rows: 1fr 1fr;  /* ← two rows, 50% each */
+  gap: 0.5rem;
+  box-sizing: border-box;
+  /* inherits height from #threeColumn because of align-items: stretch */
+}
+#traitsColumn .frame {
+  height: 100%;
+  box-sizing: border-box;
+}
+/* Stat Blocks */
+
+
+
+
+
+
+#statsBox .block-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#statsBox .block-header button {
+  margin: 0;    /* reset any default margins */
+  padding: 0.25em 0.5em;
+  /* (any other button styling) */
+}
+#statsBox .grid-container {
+
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+   align-items: center;
+
+  gap: 1px;
+}
+
+/* General Grid Container */
+.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 5px;
+}
+.grid-item label {
+  display: block;
+  font-size: 12px;
+  font-weight: bold;
+  margin-bottom: 3px;
+}
+
+.grid-item input {
+  width: 100%;
+  padding: 5px;
+  font-size: 12px;
+  box-sizing: border-box;
+  border: 1px solid #999;
+  background-color: #fff;
+}
+
+.grid-item {
+  display: inline-block;
+	margin-top: 5px;
+  grid-auto-columns: 1fr; /* each column at least 80px, but share available space */
+  gap: 1px;
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 1px;
+  padding: 5px;
+  border: 1px solid #999;
+  background-color: #4c595f;
+  color: #fff;
+}
+
+
+.wounds-item {
+  display: flex;
+	margin-top: 5px;
+  grid-auto-columns: 1fr; /* each column at least 80px, but share available space */
+  gap: 10px;
+  font-weight: bold;
+  font-size: 10px;
+      text-align: left;
+  margin-bottom: 1px;
+  padding: 1px;
+  border: 1px solid #999;
+  background-color: #4c595f;
+  color: #fff;
+}
+
+
+
+.luck-container {
+  display: flex;
+  align-items: center;
+}
+
+.luck-container #restoreLuckBtn {
+  font-size: 8px;
+  margin-left: 5px;
+  padding: 2px 5px;
+  cursor: pointer;
+}
+
+/* Wounds Section */
+
+.wounds-item input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin: 4px;
+}
+
+#woundsStatus {
+	gap: 10px;
+  margin-top: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #900;
+}
+
+
+
+
+/* Skills Section */
+
+#skillHeaders {
+  display: grid;
+  grid-template-columns: 200px 50px 40px 50px 40px;
+  gap: 0px;
+  font-weight: bold;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
+#skillHeaders > div {
+  padding: 5px;
+  border: 1px solid #999;
+  background-color: #4c595f;
+  text-align: center;
+    color: #ffffff;
+}
+#skillsList .skill-item input.string-field,
+#skillsList .skill-item input.skill-rank,
+#skillsList .skill-item input.skill-stat,
+#skillsList .skill-item button.skill-delete,
+#skillsList .skill-item input.skill-bonus {
+	height: 20px;
+  padding: 3px;
+  box-sizing: border-box;
+}
+#skillsList .skill-item {
+  font-size: 10px;       /* reduce font size */
+  line-height: 0.8;      /* tighter line spacing */
+  margin-bottom: 0px;    /* reduce space between rows */
+  gap: 2px;              /* reduce grid gap */
+  display: grid;
+  grid-template-columns: 200px 40px 40px 40px 40px;
+  align-items: left;
+}
+#skillsList .skill-item input.string-field {
+  width: 200;
+  max-width: 200px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+#skillsList .skill-item .skill-stat {
+  padding: 5px;
+  font-size: 10px;
+  border: 1px solid #999;
+  background-color: #fff;
+}
+#skillsList .skill-item input[type="number"] {
+  width: 40px;
+  padding: 5px;
+  font-size: 10px;
+  border: 1px solid #999;
+  background-color: #fff;
+}
+#skillsList .skill-item .skill-bonus {
+  background-color: #e0dfe4;
+}
+#skillsList .skill-item button.skill-delete {
+  width: 40px;
+  padding: 5px 2px;
+  font-size: 10px;
+}
+
+
+
+/* Hide spinner arrows in WebKit browsers */
+#skillsList.locked input[type="number"]::-webkit-inner-spin-button,
+#skillsList.locked input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+
+
+/* INVENTORY HEADERS */
+/* Equipment has 4 “cells”: Name | Type | Info | Delete */
+#equipmentHeaders {
+  display: grid;
+  grid-template-columns: 200px 150px 350px 40px;
+  gap: 1px;
+}
+#equipmentHeaders > div {
+  padding: 5px;
+  border: 1px solid #999;
+  background: #4c595f;
+  color: white;
+  font-weight: bold;
+  font-size: 12px;
+}
+/* Weapons has 12 cells – set each explicitly */
+#weaponHeaders {
+  display: grid;
+  grid-template-columns:
+    200px  /* Name   */
+     55px  /* Skill  */
+     40px  /* DMG    */
+     60px  /* Min DMG*/
+     30px  /* AD     */
+     30px  /* Wgt    */
+     40px  /* ROF    */
+     50px  /* Recoil */
+     50px  /* Range  */
+     30px  /* Clip   */
+     40px  /* Cost   */
+    240px /* Info   */
+	40px;
+  gap: 1px;
+}
+#weaponHeaders > div {
+  padding: 5px;
+  border: 1px solid #999;
+  background-color: #4c595f;
+  color: #fff;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+/* Armour */
+#armourHeaders {
+  display: grid;
+  grid-template-columns:
+    200px  /* Name       */
+     50px  /* PV         */
+    150px  /* Resistance */
+     50px  /* Wgt        */
+    350px /* Info       */
+	40px;
+  gap: 1px;
+}
+#armourHeaders > div {
+  padding: 5px;
+  border: 1px solid #999;
+  background-color: #4c595f;
+  color: #fff;
+  font-weight: bold;
+  font-size: 12px;
+}
+
+/* Drugs */
+#drugHeaders {
+  display: grid;
+  grid-template-columns:
+    200px  /* Name        */
+    150px  /* Effect      */
+     40px  /* AR          */
+     40px  /* AD          */
+    150px  /* Detox Effect*/
+    200px /* Info        */
+	40px;
+  gap: 1px;
+}
+#drugHeaders > div {
+  padding: 5px;
+  border: 1px solid #999;
+  background-color: #4c595f;
+  color: #fff;
+  font-weight: bold;
+  font-size: 12px;
+}
+/* 1) Make each header container have 30px tall rows */
+#equipmentHeaders,
+#weaponHeaders,
+#armourHeaders,
+#drugHeaders {
+  /* force every implicit row to be exactly 30px high */
+  grid-auto-rows: 30px;
+}
+
+/* 2) Force each header cell to be exactly 30px tall, center its text */
+#equipmentHeaders > div,
+#weaponHeaders > div,
+#armourHeaders > div,
+#drugHeaders > div {
+  height: 30px;            /* exact height */
+  line-height: normal;      /* reset line-height so flex centering works */
+  display: flex;            /* flex so we can center vertically */
+  align-items: center;      /* vertical centering */
+  padding: 0 5px;           /* keep your horizontal padding */
+}
+
+/* 3) If you want to remove any extra vertical padding you may already have: */
+#equipmentHeaders > div,
+#weaponHeaders > div,
+#armourHeaders > div,
+#drugHeaders > div {
+  /* override any old padding-top / padding-bottom */
+  padding-top: 0;
+  padding-bottom: 0;
+}
+/* 1) Turn the list container itself into a grid with the same column tracks as the headers */
+#equipmentBox #equipmentList {
+  display: grid;
+  grid-template-columns: 200px 150px 350px 40px;  /* ← same as #equipmentHeaders */
+  gap: 1px;
+}
+
+/* 2) Let each .equipment-item simply drop its children into those columns */
+#equipmentBox #equipmentList .equipment-item {
+  display: contents;
+}
+
+/* 3) Make sure each cell inside your item gets no extra margins/padding that would break the grid alignment */
+#equipmentBox #equipmentList .equipment-item > div {
+  margin: 0;
+  padding: 0;
+}
+
+#weaponsBox #weaponList {
+  display: grid;
+  grid-template-columns: 200px 55px 40px 60px 30px 30px 40px 50px 50px 30px 40px 240px 40px;
+  gap: 1px;
+}
+#weaponsBox #weaponList .weapon-item { display: contents; }
+
+#armourBox #armourList {
+  display: grid;
+  grid-template-columns: 200px 50px 150px 50px 350px 40px;
+  gap: 1px;
+}
+#armourBox #armourList .armour-item { display: contents; }
+
+#drugBox #drugList {
+  display: grid;
+  grid-template-columns: 200px 150px 40px 40px 150px 200px 40px;
+  gap: 1px;
+}
+#drugBox #drugList .drug-item { display: contents; }
+
+
+/* Hide spinner arrows in WebKit browsers */
+#traitsList.locked input[type="number"]::-webkit-inner-spin-button,
+#traitsList.locked input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide spinner arrows in Firefox */
+#traitsList.locked input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+/* Hide spinner arrows in Firefox */
+#skillsList.locked input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+
+
+
+
+
+/* Equipment & Additional Notes */
+.detail-group {
+  margin-bottom: 5px;
+}
+.detail-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: #444;
+}
+.detail-group input[type="text"],
+.detail-group textarea {
+  width: 100%;
+  padding: 5px;
+  font-size: 12px;
+  border: 1px solid #999;
+  background-color: #fff;
+  margin-bottom: 5px;
+  box-sizing: border-box;
+}
+
+
+
+#traitsList .trait-item .trait-rank {
+  width: 30px; /* Adjust as needed */
+}
+
+#traitsList .trait-item input,
+#traitsList .trait-item button {
+  height: 20px;       /* Set a uniform height */
+    font-size: 10px;
+  box-sizing: border-box;
+}
+
+#traitsList.locked {
+  opacity: 1;
+  pointer-events: none;
+}
+
+#abilityList .ability-item .ability-rank {
+  width: 30px; /* Adjust as needed */
+}
+
+#abilityList .ability-item input,
+#abilityList .ability-item button {
+  height: 20px;       /* Set a uniform height */
+    font-size: 10px;
+  box-sizing: border-box;
+}
+
+
+
+
+
+
+
+	
+#movementEncumbranceBox .grid-container,
+#moneyXpBox .grid-container {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 2px; /* Adjust gap if needed */
+  margin-top: 2px;
+}
+
+#movementEncumbranceBox .grid-item ,
+#moneyXpBox .grid-item  {
+  align-items: center;
+  text-align: left;
+}
+
+#movementEncumbranceBox .grid-item label,
+#moneyXpBox .grid-item label {
+	font-size: 8px;
+  margin: 2px; /* Adjust spacing as needed */
+}
+
+
+
+#traitsBox {
+  margin-bottom: 10px; /* reduce from the default 15px */
+}
+#inventory > .sheet {
+  width: 1000px;
+  height: 1200px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;           /* space between frames */
+  padding: 20px;       /* inner margin if you like */
+  overflow: hidden;    /* no scrollbars on the outer container */
+}
+
+/* Each of the four “.frame” boxes inside inventory */
+#inventory > .sheet .frame {
+  flex: 1 1 0;         /* each frame takes equal height */
+  display: flex;
+  flex-direction: column;
+  overflow: auto;      /* scroll its contents if they overflow */
+}
+
+/* Keep the <h3> title at natural height, and let the list and button fill the rest */
+#inventory > .sheet .frame > h3 {
+  margin: 0 0 0.5em;
+  flex: 0 0 auto;
+}
+#inventory > .sheet .frame > div[id$="Headers"],
+#inventory > .sheet .frame > div[id$="List"],
+#inventory > .sheet .frame > button {
+  flex: 1 1 auto;
+}
+#notesBox .frame {
+  width: 1000px;
+  height: 1200px;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;              /* if you want inner padding */
+  box-sizing: border-box;
+}
+/* Let the textarea grow to fill the frame, and keep its border */
+#notesBox .frame textarea {
+  flex: 1 1 auto;             /* fill available vertical space */
+  width: 100%;                /* fill horizontal space */
+  box-sizing: border-box;     /* include its padding+border in those dimensions */
+  border: 1px solid #999;     /* match your existing style */
+  resize: none;               /* disable manual resizing, if you like */
+}
+@media print {
+  /* Make the notes container auto-size in print */
+  #notesBox,
+  #notesBox .frame {
+    height: auto !important;
+    display: block !important;
+    page-break-inside: avoid; /* don’t break the frame itself if possible */
+  }
+
+  /* Turn the textarea into a normal pre-wrapped block for printing */
+  #notesBox textarea {
+    /* let it grow to its content */
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+
+    /* allow it to break across pages */
+    page-break-inside: auto !important;
+    break-inside: auto !important;
+
+    /* preserve line breaks */
+    white-space: pre-wrap !important;
+    
+    /* keep your border */
+    border: 1px solid #999 !important;
+    
+    /* remove the native control appearance */
+    background: transparent !important;
+    resize: none !important;
+  }
+}
+@media print {
+  /* hide the real textarea */
+  #notesBox textarea {
+    display: none !important;
+  }
+
+  /* show the print-only div */
+  .print-only {
+    display: block !important;
+    white-space: pre-wrap;        /* preserve line-breaks */
+    border: 1px solid #999;       /* keep your frame border */
+    padding: 5px;
+    box-sizing: border-box;
+    /* allow it to break across pages: */
+    page-break-inside: auto;
+    break-inside: auto;
+  }
+}
+@media screen {
+  /* hide the print-only div on screen */
+  .print-only { display: none; }
+}
+@media print {
+  /* 1) Make the Notes frame itself white (instead of its usual grey) */
+  #notesBox .frame {
+    background-color: #fff !important;
+  }
+
+  /* 2) Style the print-only DIV so it also has a white background and border */
+  #notesPrint {
+    display: block !important;
+    background-color: #fff;
+    border: 1px solid #999;
+    padding: 5px;
+    box-sizing: border-box;
+    white-space: pre-wrap;      /* preserve line breaks */
+    page-break-inside: auto;
+    break-inside: auto;
+    font-size: 12px;
+    line-height: 1.4em;
+
+    /* eight lines × line-height */
+    min-height: calc(1.4em * 8);
+
+    /* allow it to grow beyond 8 lines if the user typed more */
+    height: auto;
+
+
+  }
+
+  /* Hide the textarea in print */
+  #notesBox textarea {
+    display: none !important;
+  }
+}
+@media screen {
+  /* Only show the print-only DIV at print time */
+  #notesPrint {
+    display: none;
+  }
+}
+
+
+  #creationSteps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  #creationSteps li {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 14px;
+  }
+  #creationSteps input[type="checkbox"] {
+    margin-right: 8px;
+    transform: scale(1.2);
+  }
+  #creationSteps button {
+    margin-left: 12px;
+    padding: 4px 8px;
+    font-size: 13px;
+  }
+
+
+/* Specific button styles for interactive controls */
+#saveLoadPrint button, 
+.hp-container #restoreHpBtn, 
+.luck-container #restoreLuckBtn, 
+#addSkillBtn, 
+#addAbilityBtn,
+
+#addTraitBtn {
+  border: none;
+  border-radius: 4px;
+  background-color: #2c2631;
+  color: #fff;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+#saveLoadPrint button:hover,
+.hp-container #restoreHpBtn:hover,
+.luck-container #restoreLuckBtn:hover,
+#addSkillBtn:hover,
+#addTraitBtn:hover {
+  background-color: #2c252d;
+}
+
+/* The Modal (background) */
+.modal {
+  display: none; /* Hidden by default */
+  position: fixed; 
+  z-index: 1000; /* Sit on top */
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  overflow: auto; /* Enable scroll if needed */
+  background-color: rgba(0, 0, 0, 0.5); /* Black w/ opacity */
+}
+
+/* Modal Content */
+.modal-content {
+  background-color: #fefefe;
+  margin: 15% auto; /* 15% from top and centered */
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 400px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.26);
+}
+
+/* The Close Button */
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+}
+
+/* Hide spinner for Chrome, Safari, Edge, Opera */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Hide spinner for Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
+
+
+
+@media print {
+  #allocateBonusBtn,
+  #lockTraitsToggle,
+  #lockToggle,
+  #allocateSkillPointsBtn,
+  #resetSkillAllocationBtn,
+  #pointsRemainingDisplay,
+  #undoSkillAllocationBtn,
+  #addSpeciesSkillsBtn {
+    display: none;
+  }
+}
+
+@media print {
+  #saveLoadPrint {
+    display: none !important;
+  }
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+  
+  @media print {
+  /* Hide only the placeholder text in inputs and textareas */
+  input::-webkit-input-placeholder,
+  textarea::-webkit-input-placeholder {
+    color: transparent !important;
+  }
+  input::-moz-placeholder,
+  textarea::-moz-placeholder {
+    color: transparent !important;
+  }
+  input:-ms-input-placeholder,
+  textarea:-ms-input-placeholder {
+    color: transparent !important;
+  }
+  input::placeholder,
+  textarea::placeholder {
+    color: transparent !important;
+  }
+
+/* ── Print: show all tabs, hide nav & buttons ── */
+@media print {
+  /* show every tab pane */
+  .tab-content {
+    display: block !important;
+  }
+
+  /* hide the tab buttons, lock-toggle and print/load/reset controls */
+  .sheet-header .tabs,
+  .tab-button,
+  #toggleContainersBtn,
+  #globalLockToggle,
+  #saveLoadPrint {
+    display: none !important;
+  }
+}
+}
+
+.equipment-item input[type="text"],
+.weapon-item    input[type="text"],
+.armour-item    input[type="text"],
+.drug-item      input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;  /* include padding/border in that 100% */
+}
+
